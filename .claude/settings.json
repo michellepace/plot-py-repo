@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.python.org)",
+      "WebFetch(domain:docs.pytest.org)",
+      "WebFetch(domain:docs.astral.sh)",
+
+      "Bash(mkdir:*)",
+      "Bash(echo:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(uv --help:*)",
+      "Bash(uv run:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv tree:*)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.envrc)",
+
+      "Read(**/.pytest_cache)",
+      "Read(**/.ruff_cache)",
+      "Read(**/.venv)"
+    ]
+  }
+}
