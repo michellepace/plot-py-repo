@@ -53,12 +53,15 @@ def get_commits(repo_path: str) -> list[tuple[str, int]]:
         return commits
 
 
-def generate_csv(repo_path: str, output_path: str) -> None:
+def generate_csv(repo_path: str, output_dir: str) -> str:
     """Generate CSV file from Git commit history.
 
     Args:
         repo_path: Path to Git repository
-        output_path: Path where CSV file should be written
+        output_dir: Directory where CSV file should be written
+
+    Returns:
+        Path to the generated CSV file
 
     Raises:
         SystemExit: If Git log cannot be read or no Python files found
@@ -67,8 +70,8 @@ def generate_csv(repo_path: str, output_path: str) -> None:
     display_path = repo_path if repo_path != "." else "current directory"
     print(f"➡️  Analyzing Git history at {display_path}...")
 
-    # Check if file exists (will be overwritten)
-    output_file = Path(output_path)
+    # Construct output file path
+    output_file = Path(output_dir) / "repo_history.csv"
     file_exists = output_file.exists()
 
     # Get commits
@@ -87,7 +90,7 @@ def generate_csv(repo_path: str, output_path: str) -> None:
     lines_written = 0
 
     with output_file.open("w", encoding="utf-8") as f:
-        f.write("datetime,commit_id,dir_group,filename,category,line_count\n")
+        f.write("timestamp,commit_id,filedir,filename,category,line_count\n")
         lines_written += 1
 
         for commit_hash, timestamp in commits:
@@ -117,17 +120,17 @@ def generate_csv(repo_path: str, output_path: str) -> None:
 
             for file_path in files:
                 total_python_files += 1
-                dir_group = (
+                filedir = (
                     "src"
                     if file_path.startswith("src/")
                     else "tests"
                     if file_path.startswith("tests/")
                     else None
                 )
-                if not dir_group:
+                if not filedir:
                     continue
 
-                simplified_name = file_path.removeprefix(f"{dir_group}/")
+                simplified_name = file_path.removeprefix(f"{filedir}/")
 
                 try:
                     content_output = subprocess.check_output(  # noqa: S603
@@ -144,10 +147,10 @@ def generate_csv(repo_path: str, output_path: str) -> None:
 
                 # Write rows (include even if 0)
                 f.write(
-                    f"{dt},{commit_hash},{dir_group},{simplified_name},code,{code_lines}\n"
+                    f"{dt},{commit_hash},{filedir},{simplified_name},code,{code_lines}\n"
                 )
                 f.write(
-                    f"{dt},{commit_hash},{dir_group},{simplified_name},docstrings_comments,{doc_comm_lines}\n"
+                    f"{dt},{commit_hash},{filedir},{simplified_name},docstrings_comments,{doc_comm_lines}\n"
                 )
                 lines_written += 2
 
@@ -159,6 +162,8 @@ def generate_csv(repo_path: str, output_path: str) -> None:
 
     # Success message
     overwrite_msg = " (overwrote existing file)" if file_exists else ""
-    print(f"✅  Success! Created {output_path}{overwrite_msg}")
+    print(f"✅  Success! Created {output_file}{overwrite_msg}")
     print(f"    • {len(commits)} commits analyzed")
     print(f"    • {lines_written:,} lines written")
+
+    return str(output_file)

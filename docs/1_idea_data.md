@@ -21,13 +21,13 @@ All Git commits, scanning Python files in `src/` and `tests/` directories only.
 To facilitate processing with Pandas and Plotly Express:
 
 ```text
-datetime,commit_id,dir_group,filename,category,line_count
+timestamp,commit_id,filedir,filename,category,line_count
 2025-10-01T12:00:00Z,abc123def456,src,cli.py,code,500
 2025-10-01T12:00:00Z,abc123def456,src,cli.py,docstrings_comments,100
 2025-10-01T12:00:00Z,abc123def456,tests,test_cli.py,code,30
 ```
 
-This structure is complete and supports both graphs efficiently. It includes `datetime` and `commit_id` for temporal flexibility (e.g., daily or weekly aggregation for the stacked chart), `dir_group` for quick categorisation, `filename` for module-level granularity in the bar chart, `category` to separate code from docstrings/comments, and `line_count` for the actual metric.
+This structure is complete and supports both graphs efficiently. It includes `timestamp` and `commit_id` for temporal flexibility (e.g., daily or weekly aggregation for the stacked chart), `filedir` for quick categorisation, `filename` for module-level granularity in the bar chart, `category` to separate code from docstrings/comments, and `line_count` for the actual metric.
 
 ### Existing Script To Count Lines
 
