@@ -23,8 +23,42 @@ def run_cli(*args: str) -> tuple[str, int]:
     return result.stdout + result.stderr, result.returncode
 
 
+def create_test_git_repo(repo_dir: Path) -> None:
+    """Create a minimal Git repository for testing.
+
+    Args:
+        repo_dir: Directory where Git repo should be created
+    """
+    repo_dir.mkdir(exist_ok=True)
+    (repo_dir / "src").mkdir(exist_ok=True)
+    test_file = repo_dir / "src" / "example.py"
+    test_file.write_text('"""Module docstring."""\n\nprint("hello")\n')
+
+    # Initialize Git and make a commit
+    subprocess.run(["git", "init"], cwd=repo_dir, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "config", "user.email", "test@test.com"],
+        cwd=repo_dir,
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Test User"],
+        cwd=repo_dir,
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "commit", "-m", "Initial commit"],
+        cwd=repo_dir,
+        check=True,
+        capture_output=True,
+    )
+
+
 def test_help_message() -> None:
-    """Test that help message shows new simplified interface."""
+    """Displays usage, flags, and examples without legacy subcommands."""
     output, _ = run_cli("--help")
     assert "Visualise Python repository evolution" in output
     assert "repo_path" in output
@@ -36,93 +70,29 @@ def test_help_message() -> None:
     assert "generate-csv" not in output
 
 
-def test_visualize_default(tmp_path: Path) -> None:
-    """Test default behavior analyses current directory."""
-    # Create a minimal Git repo
+def test_git_analysis_creates_csv_and_images_in_output_dir(tmp_path: Path) -> None:
+    """Full pipeline: Git commits → CSV + WebP charts in --output-dir."""
     repo_dir = tmp_path / "test_repo"
-    repo_dir.mkdir()
-    (repo_dir / "src").mkdir()
-    test_file = repo_dir / "src" / "example.py"
-    test_file.write_text('"""Module docstring."""\n\nprint("hello")\n')
-
-    # Initialize Git and make a commit
-    subprocess.run(["git", "init"], cwd=repo_dir, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "config", "user.email", "test@test.com"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-    subprocess.run(
-        ["git", "config", "user.name", "Test User"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-    subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "commit", "-m", "Initial commit"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-
-    # Run CLI from repo directory
-    _output, exit_code = run_cli("--output-dir", str(tmp_path))
-
-    # Should create CSV and images
-    assert exit_code == 0
-    assert (tmp_path / "repo_history.csv").exists()
-    assert (tmp_path / "repo_evolution.webp").exists()
-    assert (tmp_path / "repo_modules.webp").exists()
-
-
-def test_visualize_specific_repo(tmp_path: Path) -> None:
-    """Test analysing a specific repository path."""
-    # Create a minimal Git repo
-    repo_dir = tmp_path / "test_repo"
-    repo_dir.mkdir()
-    (repo_dir / "src").mkdir()
-    test_file = repo_dir / "src" / "example.py"
-    test_file.write_text('"""Module docstring."""\n\nprint("hello")\n')
-
-    # Initialize Git and make a commit
-    subprocess.run(["git", "init"], cwd=repo_dir, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "config", "user.email", "test@test.com"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-    subprocess.run(
-        ["git", "config", "user.name", "Test User"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-    subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "commit", "-m", "Initial commit"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
+    create_test_git_repo(repo_dir)
 
     output_dir = tmp_path / "output"
     output_dir.mkdir()
 
-    # Run CLI with specific repo path
+    # Run full pipeline with specific repo path and output directory
     _output, exit_code = run_cli(str(repo_dir), "--output-dir", str(output_dir))
 
-    # Should create CSV and images in output dir
+    # Verify all outputs created in correct location
     assert exit_code == 0
     assert (output_dir / "repo_history.csv").exists()
     assert (output_dir / "repo_evolution.webp").exists()
     assert (output_dir / "repo_modules.webp").exists()
 
+    # Verify files NOT created in repo directory
+    assert not (repo_dir / "repo_history.csv").exists()
 
-def test_visualize_csv_flag(tmp_path: Path) -> None:
-    """Test --csv flag skips Git analysis and just creates visualisations."""
+
+def test_csv_flag_generates_images_from_existing_csv(tmp_path: Path) -> None:
+    """Skips Git traversal, reads provided CSV, generates charts only."""
     # Create a sample CSV file
     csv_file = tmp_path / "sample.csv"
     csv_file.write_text(
@@ -137,54 +107,8 @@ def test_visualize_csv_flag(tmp_path: Path) -> None:
     # Run CLI with --csv flag
     _output, exit_code = run_cli("--csv", str(csv_file), "--output-dir", str(output_dir))
 
-    # Should create images but NOT CSV
+    # Should create images but NOT regenerate CSV
     assert exit_code == 0
     assert not (output_dir / "repo_history.csv").exists()
     assert (output_dir / "repo_evolution.webp").exists()
     assert (output_dir / "repo_modules.webp").exists()
-
-
-def test_visualize_output_dir(tmp_path: Path) -> None:
-    """Test --output-dir flag controls where files are written."""
-    # Create a minimal Git repo
-    repo_dir = tmp_path / "test_repo"
-    repo_dir.mkdir()
-    (repo_dir / "src").mkdir()
-    test_file = repo_dir / "src" / "example.py"
-    test_file.write_text('"""Module docstring."""\n\nprint("hello")\n')
-
-    # Initialize Git and make a commit
-    subprocess.run(["git", "init"], cwd=repo_dir, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "config", "user.email", "test@test.com"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-    subprocess.run(
-        ["git", "config", "user.name", "Test User"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-    subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "commit", "-m", "Initial commit"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-
-    output_dir = tmp_path / "custom_output"
-    output_dir.mkdir()
-
-    # Run CLI with custom output directory
-    _output, exit_code = run_cli(str(repo_dir), "--output-dir", str(output_dir))
-
-    # All files should be in custom output directory
-    assert exit_code == 0
-    assert (output_dir / "repo_history.csv").exists()
-    assert (output_dir / "repo_evolution.webp").exists()
-    assert (output_dir / "repo_modules.webp").exists()
-    # Should NOT be in repo directory
-    assert not (repo_dir / "repo_history.csv").exists()
