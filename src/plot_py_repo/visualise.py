@@ -5,6 +5,8 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 
+from .theme import apply_common_layout
+
 
 def create_images(csv_path: str, output_dir: str) -> None:
     """Create both evolution and module visualisation images from CSV.
@@ -94,21 +96,10 @@ def _plot_evolution(df: pd.DataFrame, output_path: Path) -> None:
         color="category",
         title="Python Repository Evolution Over Time",
         labels={"date": "Date", "line_count": "Lines of Code", "category": "Category"},
-        color_discrete_map={
-            "Source Code": "#41668c",
-            "Test Code": "#4a366f",
-            "Docstrings/Comments": "#8b8b8b",
-        },
         category_orders={"category": ["Source Code", "Test Code", "Docstrings/Comments"]},
     )
 
-    fig.update_layout(
-        template="plotly_white",
-        width=1600,
-        height=900,
-        font={"size": 14},
-        hovermode="x unified",
-    )
+    apply_common_layout(fig)
 
     fig.write_image(str(output_path), scale=2)
 
@@ -129,33 +120,22 @@ def _plot_modules(df: pd.DataFrame, output_path: Path) -> None:
         df_latest.groupby(["filedir", "filename"])["line_count"].sum().reset_index()
     )
 
-    # Create full path display
-    df_modules["module"] = df_modules["filedir"] + "/" + df_modules["filename"]
-
-    # Sort by line count descending
-    df_modules = df_modules.sort_values("line_count", ascending=True)
+    # Sort by line count: largest at top for horizontal bar chart
+    df_modules = df_modules.sort_values("line_count", ascending=False)
 
     # Create horizontal bar chart
     fig = px.bar(
         df_modules,
-        y="module",
+        y="filename",
         x="line_count",
         color="filedir",
         title="Module Breakdown (Latest Commit)",
-        labels={"module": "Module", "line_count": "Lines of Code", "filedir": "Type"},
-        color_discrete_map={"src": "#41668c", "tests": "#4a366f"},
+        labels={"filename": "", "line_count": "Lines of Code", "filedir": "Type"},
         text="line_count",
         orientation="h",
+        category_orders={"filename": df_modules["filename"].tolist()},
     )
 
-    fig.update_layout(
-        template="plotly_white",
-        width=1600,
-        height=900,
-        font={"size": 14},
-        showlegend=True,
-    )
-
-    fig.update_traces(textposition="outside")
+    apply_common_layout(fig)
 
     fig.write_image(str(output_path), scale=2)

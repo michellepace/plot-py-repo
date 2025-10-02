@@ -22,7 +22,7 @@ cli.py
                │           │    • Group by date
                │           │    • Aggregate categories
                │           └─ _plot_and_save(df_prepared, path)
-               │                • Uses theme.COLORS, theme.apply_common_layout()
+               │                • Uses theme.apply_common_layout()
                │
                ├──> chart_modules.py
                │      │ from . import theme  ← imports theme
@@ -32,18 +32,17 @@ cli.py
                │           │    • Group by module
                │           │    • Sort by line count
                │           └─ _plot_and_save(df_prepared, path)
-               │                • Uses theme.COLORS, theme.apply_common_layout()
+               │                • Uses theme.apply_common_layout()
                │
                └──> chart_complexity.py (future)
                       │ from . import theme  ← imports theme
                       └─ create(df, output_path)
                            ├─ _prepare_data(df) → df_prepared
                            └─ _plot_and_save(df_prepared, path)
-                                • Uses theme.COLORS, theme.apply_common_layout()
+                                • Uses theme.apply_common_layout()
 
 theme.py (CENTRALIZED THEMING)
-  • COLORS: Color palette for all charts
-  • DEFAULT_LAYOUT: width, height, font, template
+  • DEFAULT_LAYOUT: width, height, template
   • apply_common_layout(fig): Apply standard settings
   • Chart modules import directly (NOT passed as parameter)
 ```

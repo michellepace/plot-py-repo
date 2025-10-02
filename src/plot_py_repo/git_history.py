@@ -130,7 +130,7 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                 if not filedir:
                     continue
 
-                simplified_name = file_path.removeprefix(f"{filedir}/")
+                filename = Path(file_path).name
 
                 try:
                     content_output = subprocess.check_output(  # noqa: S603
@@ -146,11 +146,9 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                 doc_comm_lines = doc_lines + comm_lines
 
                 # Write rows (include even if 0)
+                f.write(f"{dt},{commit_hash},{filedir},{filename},code,{code_lines}\n")
                 f.write(
-                    f"{dt},{commit_hash},{filedir},{simplified_name},code,{code_lines}\n"
-                )
-                f.write(
-                    f"{dt},{commit_hash},{filedir},{simplified_name},docstrings_comments,{doc_comm_lines}\n"
+                    f"{dt},{commit_hash},{filedir},{filename},docstrings_comments,{doc_comm_lines}\n"
                 )
                 lines_written += 2
 
