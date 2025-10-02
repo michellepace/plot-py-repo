@@ -53,16 +53,28 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
+def _calculate_category_order(df_prepared: pd.DataFrame) -> list[str]:
+    """Calculate category display order by total line count (descending).
+
+    Returns:
+        List of category names sorted by total lines, largest first
+    """
+    category_totals = df_prepared.groupby("category")["line_count"].sum()
+    return category_totals.sort_values(ascending=False).index.tolist()
+
+
 def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
     """Generate stacked area chart and write WebP image to output_path."""
+    category_order = _calculate_category_order(df_prepared)
+
     fig = px.area(
         df_prepared,
         x="date",
         y="line_count",
         color="category",
-        title="Python Repository Evolution Over Time",
+        title="Repository Growth Over Time",
         labels={"date": "Date", "line_count": "Lines of Code", "category": "Category"},
-        category_orders={"category": ["Source Code", "Test Code", "Docstrings/Comments"]},
+        category_orders={"category": category_order},
     )
 
     apply_common_layout(fig)

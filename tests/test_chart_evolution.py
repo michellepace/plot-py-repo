@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from plot_py_repo.chart_evolution import create
+from plot_py_repo.chart_evolution import _calculate_category_order, create
 
 
 @pytest.mark.slow
@@ -26,3 +26,18 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
     create(df, output_path)
 
     assert output_path.exists()
+
+
+def test_calculate_category_order_returns_categories_sorted_by_total_lines() -> None:
+    """Categories ordered by total line count descending (largest first)."""
+    df_prepared = pd.DataFrame(
+        {
+            "date": ["2024-01-01", "2024-01-01", "2024-01-02", "2024-01-02"],
+            "category": ["Source Code", "Test Code", "Source Code", "Test Code"],
+            "line_count": [100, 300, 150, 400],  # Test Code total=700, Source=250
+        }
+    )
+
+    result = _calculate_category_order(df_prepared)
+
+    assert result == ["Test Code", "Source Code"]  # Largest first

@@ -20,11 +20,7 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 
 
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Transform commit data into file-level line counts for latest commit.
-
-    Returns:
-        DataFrame with columns: filedir, filename, line_count
-    """
+    """Transform commit data into file-level line counts for latest commit."""
     # Filter to latest commit only
     latest_timestamp = df["timestamp"].max()
     df_latest = df[df["timestamp"] == latest_timestamp].copy()
@@ -46,7 +42,7 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         y="filename",
         x="line_count",
         color="filedir",
-        title="Module Breakdown (Latest Commit)",
+        title="Repository Breakdown by File (current state)",
         labels={"filename": "", "line_count": "Lines of Code", "filedir": "Type"},
         text="line_count",
         orientation="h",
