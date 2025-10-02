@@ -4,6 +4,8 @@
       "WebFetch(domain:docs.python.org)",
       "WebFetch(domain:docs.pytest.org)",
       "WebFetch(domain:docs.astral.sh)",
+      "WebFetch(domain:plotly.com)",
+      "WebFetch(domain:altair-viz.github.io)",
 
       "Bash(mkdir:*)",
       "Bash(echo:*)",
@@ -17,6 +19,7 @@
       "Bash(uv sync:*)",
       "Bash(uv tree:*)"
     ],
+
     "deny": [
       "Read(**/.env)",
       "Read(**/.envrc)",
