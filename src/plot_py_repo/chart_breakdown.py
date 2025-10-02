@@ -1,4 +1,4 @@
-"""Module chart generation for Python repository evolution."""
+"""Breakdown chart generation for Python repository evolution."""
 
 from pathlib import Path
 
@@ -9,7 +9,7 @@ from .theme import apply_common_layout
 
 
 def create(df: pd.DataFrame, output_path: Path) -> None:
-    """Create horizontal bar chart showing line counts per module.
+    """Create horizontal bar chart showing repository breakdown by file.
 
     Args:
         df: DataFrame with commit history data
@@ -20,7 +20,7 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 
 
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Transform commit data into module-level line counts for latest commit.
+    """Transform commit data into file-level line counts for latest commit.
 
     Returns:
         DataFrame with columns: filedir, filename, line_count

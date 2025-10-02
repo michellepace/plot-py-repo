@@ -22,7 +22,7 @@ cli.py
                │           └─ _plot_and_save(df_prepared, path)
                │                Stacked area chart with theme
                │
-               ├──> chart_modules.py ✅
+               ├──> chart_breakdown.py ✅
                │      └─ create(df, output_path)
                │           ├─ _prepare_data(df) → df_prepared
                │           │    Filter to latest commit, group by module
@@ -47,7 +47,7 @@ theme.py ✅ (CENTRALISED THEMING)
 CSV file → _load_and_exclude_files() ✅ → filtered_df
                                                       │
                                                       ├──> chart_evolution.create(df, path) ✅
-                                                      ├──> chart_modules.create(df, path) ✅
+                                                      ├──> chart_breakdown.create(df, path) ✅
                                                       └──> 🎯 chart_example.create(df, path)
 ```
 

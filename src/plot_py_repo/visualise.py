@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import chart_evolution, chart_modules
+from . import chart_breakdown, chart_evolution
 
 
 def _load_and_exclude_files(csv_path: str, filenames: list[str]) -> pd.DataFrame:
@@ -15,13 +15,13 @@ def _load_and_exclude_files(csv_path: str, filenames: list[str]) -> pd.DataFrame
 
 
 def create_charts(csv_path: str, output_dir: str) -> None:
-    """Create evolution and module visualisation WebP images from CSV history."""
+    """Create evolution and breakdown visualisation WebP images from CSV history."""
     filtered_df = _load_and_exclude_files(csv_path, ["__init__.py"])
 
     # Generate both charts
     output_path = Path(output_dir)
     chart_evolution.create(filtered_df, output_path / "repo_evolution.webp")
-    chart_modules.create(filtered_df, output_path / "repo_modules.webp")
+    chart_breakdown.create(filtered_df, output_path / "repo_breakdown.webp")
 
     print(f"✅  Created {output_path / 'repo_evolution.webp'}")
-    print(f"✅  Created {output_path / 'repo_modules.webp'}")
+    print(f"✅  Created {output_path / 'repo_breakdown.webp'}")

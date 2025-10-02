@@ -78,7 +78,7 @@ def test_git_analysis_creates_csv_and_images_in_output_dir(tmp_path: Path) -> No
     assert exit_code == 0
     assert (output_dir / "repo_history.csv").exists()
     assert (output_dir / "repo_evolution.webp").exists()
-    assert (output_dir / "repo_modules.webp").exists()
+    assert (output_dir / "repo_breakdown.webp").exists()
 
     # Verify files NOT created in repo directory
     assert not (repo_dir / "repo_history.csv").exists()
@@ -105,4 +105,4 @@ def test_csv_flag_generates_images_from_existing_csv(tmp_path: Path) -> None:
     assert exit_code == 0
     assert not (output_dir / "repo_history.csv").exists()
     assert (output_dir / "repo_evolution.webp").exists()
-    assert (output_dir / "repo_modules.webp").exists()
+    assert (output_dir / "repo_breakdown.webp").exists()

@@ -1,11 +1,11 @@
-"""Tests for chart_modules module."""
+"""Tests for chart_breakdown module."""
 
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from plot_py_repo.chart_modules import create
+from plot_py_repo.chart_breakdown import create
 
 
 @pytest.mark.slow

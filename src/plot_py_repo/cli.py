@@ -15,7 +15,7 @@ def main() -> None:
 Analyses Git commits to track code growth over time:
  • Classifies lines as code vs docstrings/comments
  • Generates CSV with line counts per file per commit
- • Creates two charts: evolution timeline and module breakdown
+ • Creates two charts: evolution timeline and breakdown by file
  """,
         epilog="""examples:
   plot-py-repo                           # Visualise current repo
