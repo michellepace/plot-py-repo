@@ -3,6 +3,8 @@
 import subprocess
 from pathlib import Path
 
+import pytest
+
 
 def run_cli(*args: str) -> tuple[str, int]:
     """Run plot-py-repo CLI and return output and exit code.
@@ -23,6 +25,11 @@ def run_cli(*args: str) -> tuple[str, int]:
     return result.stdout + result.stderr, result.returncode
 
 
+def _run_git(cmd: list[str], cwd: Path) -> None:
+    """Run git command silently in specified directory."""
+    subprocess.run(cmd, cwd=cwd, check=True, capture_output=True)  # noqa: S603
+
+
 def create_test_git_repo(repo_dir: Path) -> None:
     """Create a minimal Git repository for testing.
 
@@ -35,26 +42,11 @@ def create_test_git_repo(repo_dir: Path) -> None:
     test_file.write_text('"""Module docstring."""\n\nprint("hello")\n')
 
     # Initialize Git and make a commit
-    subprocess.run(["git", "init"], cwd=repo_dir, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "config", "user.email", "test@test.com"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-    subprocess.run(
-        ["git", "config", "user.name", "Test User"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
-    subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "commit", "-m", "Initial commit"],
-        cwd=repo_dir,
-        check=True,
-        capture_output=True,
-    )
+    _run_git(["git", "init"], repo_dir)
+    _run_git(["git", "config", "user.email", "test@test.com"], repo_dir)
+    _run_git(["git", "config", "user.name", "Test User"], repo_dir)
+    _run_git(["git", "add", "."], repo_dir)
+    _run_git(["git", "commit", "-m", "Initial commit"], repo_dir)
 
 
 def test_help_message() -> None:
@@ -70,6 +62,7 @@ def test_help_message() -> None:
     assert "generate-csv" not in output
 
 
+@pytest.mark.slow
 def test_git_analysis_creates_csv_and_images_in_output_dir(tmp_path: Path) -> None:
     """Full pipeline: Git commits → CSV + WebP charts in --output-dir."""
     repo_dir = tmp_path / "test_repo"
@@ -91,6 +84,7 @@ def test_git_analysis_creates_csv_and_images_in_output_dir(tmp_path: Path) -> No
     assert not (repo_dir / "repo_history.csv").exists()
 
 
+@pytest.mark.slow
 def test_csv_flag_generates_images_from_existing_csv(tmp_path: Path) -> None:
     """Skips Git traversal, reads provided CSV, generates charts only."""
     # Create a sample CSV file

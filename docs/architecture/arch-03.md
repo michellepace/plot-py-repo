@@ -41,9 +41,10 @@ cli.py
                            └─ _plot_and_save(df_prepared, path)
                                 • Uses theme.apply_common_layout()
 
-theme.py (CENTRALIZED THEMING)
+theme.py (CENTRALISED THEMING)
   • DEFAULT_LAYOUT: width, height, template
   • apply_common_layout(fig): Apply standard settings
+  • Relies on Plotly default colour schemes
   • Chart modules import directly (NOT passed as parameter)
 ```
 

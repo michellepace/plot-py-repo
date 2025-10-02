@@ -50,7 +50,9 @@ dev = [
 # =================================
 
 [tool.pytest.ini_options]
-markers = []
+markers = [
+    "slow: tests that generate images (≈3s per image)"
+]
 
 # =================================
 # Pyright Type Checking

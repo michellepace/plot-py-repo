@@ -27,7 +27,7 @@ def get_commits(repo_path: str) -> list[tuple[str, int]]:
     try:
         output = (
             subprocess.check_output(
-                ["/usr/bin/git", "log", "--format=%H %ct"],
+                ["/usr/bin/git", "log", "--format=%h %ct"],
                 cwd=repo_path,
                 stderr=subprocess.STDOUT,
             )

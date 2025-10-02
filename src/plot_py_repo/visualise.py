@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 
+from . import chart_evolution
 from .theme import apply_common_layout
 
 
@@ -26,82 +27,11 @@ def create_images(csv_path: str, output_dir: str) -> None:
 
     # Generate both charts
     output_path = Path(output_dir)
-    _plot_evolution(filtered_df, output_path / "repo_evolution.webp")
+    chart_evolution.create(filtered_df, output_path / "repo_evolution.webp")
     _plot_modules(filtered_df, output_path / "repo_modules.webp")
 
     print(f"✅  Created {output_path / 'repo_evolution.webp'}")
     print(f"✅  Created {output_path / 'repo_modules.webp'}")
-
-
-def _plot_evolution(df: pd.DataFrame, output_path: Path) -> None:
-    """Create stacked area chart showing codebase evolution over time.
-
-    Args:
-        df: DataFrame with commit history data
-        output_path: Path where WebP image should be saved
-    """
-    # Extract date from timestamp
-    df_evolution = df.copy()
-    df_evolution["date"] = pd.to_datetime(df_evolution["timestamp"]).dt.date
-
-    # For multiple commits per day, keep only the last one
-    df_evolution = (
-        df_evolution.sort_values("timestamp")
-        .groupby(["date", "commit_id", "filedir", "filename", "category"])
-        .last()
-        .reset_index()
-    )
-
-    # Create category groups for stacking
-    # We need: src_code, tests_code, docstrings_comments
-    aggregated = []
-
-    for date in df_evolution["date"].unique():
-        date_data = df_evolution[df_evolution["date"] == date]
-
-        # Source code lines
-        src_code = date_data[
-            (date_data["filedir"] == "src") & (date_data["category"] == "code")
-        ]["line_count"].sum()
-
-        # Test code lines
-        tests_code = date_data[
-            (date_data["filedir"] == "tests") & (date_data["category"] == "code")
-        ]["line_count"].sum()
-
-        # All docstrings/comments
-        doc_comments = date_data[date_data["category"] == "docstrings_comments"][
-            "line_count"
-        ].sum()
-
-        aggregated.extend(
-            [
-                {"date": date, "category": "Source Code", "line_count": src_code},
-                {"date": date, "category": "Test Code", "line_count": tests_code},
-                {
-                    "date": date,
-                    "category": "Docstrings/Comments",
-                    "line_count": doc_comments,
-                },
-            ]
-        )
-
-    df_plot = pd.DataFrame(aggregated)
-
-    # Create stacked area chart
-    fig = px.area(
-        df_plot,
-        x="date",
-        y="line_count",
-        color="category",
-        title="Python Repository Evolution Over Time",
-        labels={"date": "Date", "line_count": "Lines of Code", "category": "Category"},
-        category_orders={"category": ["Source Code", "Test Code", "Docstrings/Comments"]},
-    )
-
-    apply_common_layout(fig)
-
-    fig.write_image(str(output_path), scale=2)
 
 
 def _plot_modules(df: pd.DataFrame, output_path: Path) -> None:
