@@ -3,7 +3,7 @@
 import argparse
 
 from .git_history import generate_csv
-from .visualise import create_images
+from .visualise import create_charts
 
 
 def main() -> None:
@@ -52,8 +52,8 @@ Analyses Git commits to track code growth over time:
     # Execute workflow
     if args.csv:
         # Development mode: just visualise existing CSV
-        create_images(args.csv, args.output_dir)
+        create_charts(args.csv, args.output_dir)
     else:
         # Normal mode: generate CSV + visualise
         csv_path = generate_csv(args.repo_path, args.output_dir)
-        create_images(csv_path, args.output_dir)
+        create_charts(csv_path, args.output_dir)

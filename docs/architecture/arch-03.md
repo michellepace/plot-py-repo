@@ -1,20 +1,19 @@
-# ARCHITECTURE 3 (current + target)
+# ARCHITECTURE 3 - Complete and Accurate Against Codebase as of `2025-10-02`.
 
 ```
 cli.py
   │
   │ (arg parsing: repo_path, --csv, --output-dir)
   │
-  └──> visualise.py (ORCHESTRATOR)
+  └──> visualise.py (ORCHESTRATOR) ✅
          │
-         ├─ 🎯 _load_and_filter(csv_path) → DataFrame
+         ├─ _load_and_exclude_files(csv_path, filenames) ✅
          │    • Read CSV once
-         │    • Apply common filters (remove __init__.py)
-         │    • Return clean DataFrame
+         │    • Exclude rows with specified filenames
+         │    • Return filtered DataFrame
          │
-         └─ create_images(csv_path, output_dir)
-               │ Currently: inline CSV read + filter
-               │ 🎯 Target: call _load_and_filter()
+         └─ create_charts(csv_path, output_dir) ✅
+               │ Calls _load_and_exclude_files()
                │
                ├──> chart_evolution.py ✅
                │      └─ create(df, output_path)
@@ -45,15 +44,13 @@ theme.py ✅ (CENTRALISED THEMING)
 ## DATAFRAME FLOW
 
 ```
-CSV file → 🎯 _load_and_filter() → filtered_df (no __init__.py)
-                                      │
-                                      ├──> chart_evolution.create(filtered_df, path) ✅
-                                      ├──> chart_modules.create(filtered_df, path) ✅
-                                      └──> 🎯 chart_example.create(filtered_df, path)
+CSV file → _load_and_exclude_files() ✅ → filtered_df
+                                                      │
+                                                      ├──> chart_evolution.create(df, path) ✅
+                                                      ├──> chart_modules.create(df, path) ✅
+                                                      └──> 🎯 chart_example.create(df, path)
 ```
 
-**Current state:** CSV loading + filtering is inline within `create_images()`
-
-**Target state:** Extract to `_load_and_filter()` private helper function
-
-Each chart decides what it needs from the filtered DataFrame! Chart-specific transformations happen in each chart's `_prepare_data()`.
+**Pattern established:** `visualise.py` acts as pure orchestrator with no inline chart logic.
+Data loading/filtering separated into `_load_and_exclude_files()` helper.
+Each chart module follows consistent structure: `create()` → `_prepare_data()` → `_plot_and_save()`.
