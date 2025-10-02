@@ -1,1 +1,1 @@
-"""Tests for viz-python-repo package."""
+"""Tests for plot-py-repo package."""

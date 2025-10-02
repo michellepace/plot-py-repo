@@ -4,23 +4,28 @@
       "WebFetch(domain:docs.python.org)",
       "WebFetch(domain:docs.pytest.org)",
       "WebFetch(domain:docs.astral.sh)",
+      "WebFetch(domain:plotly.com)",
+      "WebFetch(domain:altair-viz.github.io)",
 
       "Bash(mkdir:*)",
       "Bash(echo:*)",
       "Bash(ls:*)",
       "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+
       "Bash(uv --help:*)",
       "Bash(uv run:*)",
       "Bash(uv sync:*)",
       "Bash(uv tree:*)"
     ],
+
     "deny": [
       "Read(**/.env)",
       "Read(**/.envrc)",
 
       "Read(**/.pytest_cache)",
-      "Read(**/.ruff_cache)",
-      "Read(**/.venv)"
+      "Read(**/.ruff_cache)"
     ]
   }
 }

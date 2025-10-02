@@ -1,11 +1,11 @@
 # Instructions for Creating Plotly Express Visualization Scripts
 
 ## Context
-I have a UV-managed Python project with Git commit history logged to `my_repo_history.csv`. I need to create two Plotly Express graphs to visualize the evolution of my codebase.
+I have a UV-managed Python project with Git commit history logged to `my_repo_history.csv`. I need to create two Plotly Express graphs to visualise the evolution of my codebase.
 
 ## CSV Data Structure
 ```csv
-datetime,commit_id,dir_group,filename,category,line_count
+timestamp,commit_id,filedir,filename,category,line_count
 2025-09-28T15:18:49+02:00,7537888b6cc73e55cf04b41e8c53bfec9ba522a4,src,youtube_to_xml/cli.py,code,119
 2025-09-28T15:18:49+02:00,7537888b6cc73e55cf04b41e8c53bfec9ba522a4,src,youtube_to_xml/cli.py,docstrings_comments,55
 ```
@@ -15,7 +15,7 @@ datetime,commit_id,dir_group,filename,category,line_count
 - **Python Version:** 3.13+
 - **Dependencies Needed:**
   - `pandas` for data processing
-  - `plotly` for visualization
+  - `plotly` for visualisation
   - `kaleido` for static image export (WebP/PNG/JPEG)
   - Install with: `uv add --dev pandas plotly kaleido`
   - **Note:** Kaleido requires Chrome/Chromium browser installed on system
@@ -29,11 +29,11 @@ datetime,commit_id,dir_group,filename,category,line_count
 - Stacked area chart showing codebase growth over time
 - **X-axis:** Date (one data point per day)
   - Aggregate all commits per day - take the LAST commit of each day as the snapshot
-  - Extract date only from `datetime` column (ignore time)
+  - Extract date only from `timestamp` column (ignore time)
 - **Y-axis:** Total non-blank line counts
 - **Stacks (bottom to top):**
-  1. Muted blue (#41668c): Source code (`dir_group=src` + `category=code`)
-  2. Muted purple (#4a366f): Test code (`dir_group=tests` + `category=code`)
+  1. Muted blue (#41668c): Source code (`filedir=src` + `category=code`)
+  2. Muted purple (#4a366f): Test code (`filedir=tests` + `category=code`)
   3. Medium gray (#8b8b8b): All docstrings/comments (`category=docstrings_comments` across both directories)
 - **Aspect Ratio:** 16:9 (recommend 1600x900 pixels, scale=2 for retina)
 - **Output:** Save as WebP image file for web embedding
@@ -45,7 +45,7 @@ datetime,commit_id,dir_group,filename,category,line_count
 
 **Data Processing Notes:**
 - **Filter out `__init__.py` files** - Exclude rows where `filename` is `__init__.py` (minimal lines, creates noise)
-- Extract date only from `datetime` column (e.g., "2025-09-28")
+- Extract date only from `timestamp` column (e.g., "2025-09-28")
 - For days with multiple commits, take the LAST commit (most recent timestamp) as the daily snapshot
 - Group by date and category, sum `line_count` for each category
 - Result: One data point per day showing repository state at end of that day
@@ -55,14 +55,14 @@ datetime,commit_id,dir_group,filename,category,line_count
 **File:** `scripts/plot_modules.py`
 
 **Requirements:**
-- Static view of latest commit only (most recent `datetime`)
+- Static view of latest commit only (most recent `timestamp`)
 - Horizontal bar chart of line counts per module
 - **Y-axis:** Module filenames (e.g., `tests/test_cli.py`, `src/youtube_to_xml/cli.py`)
   - Sort descending by total lines (largest modules at top)
 - **X-axis:** Non-blank line counts per module
 - **Colors:**
-  - Muted blue (#41668c): `dir_group=src`
-  - Muted purple (#4a366f): `dir_group=tests`
+  - Muted blue (#41668c): `filedir=src`
+  - Muted purple (#4a366f): `filedir=tests`
 - **Bars:** Show total lines per module (sum `code` + `docstrings_comments`)
 - **Labels:** Display count values on/near bars
 - **Aspect Ratio:** 16:9 (1600x900 pixels, scale=2)
@@ -74,9 +74,9 @@ datetime,commit_id,dir_group,filename,category,line_count
 
 **Data Processing Notes:**
 - **Filter out `__init__.py` files** - Exclude rows where `filename` is `__init__.py` (minimal lines, creates noise)
-- Filter to latest `datetime` only
+- Filter to latest `timestamp` only
 - Group by `filename` and sum `line_count` across both categories
-- Concatenate `dir_group` + `/` + `filename` for full path display
+- Concatenate `filedir` + `/` + `filename` for full path display
 
 ## Implementation Approach
 **Please implement Graph 1 first.** Once working, I'll ask you to implement Graph 2.
@@ -95,7 +95,7 @@ For each graph script:
 ```python
 import plotly.express as px
 
-fig = px.area(df, x='datetime', y='line_count', color='category')
+fig = px.area(df, x='timestamp', y='line_count', color='category')
 fig.update_layout(template='plotly_white', title='My Chart')
 fig.write_image("evolution.webp", width=1600, height=900, scale=2)
 ```
