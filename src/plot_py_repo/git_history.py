@@ -145,7 +145,8 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                 doc_lines, comm_lines, code_lines = classify_lines(content)
                 doc_comm_lines = doc_lines + comm_lines
 
-                # Write rows with Git's default timestamp format (include even if 0)
+                # Write rows with timestamp format: "YYYY-MM-DD HH:MM:SS +ZZZZ"
+                # (include even if 0)
                 f.write(
                     f"{git_timestamp},{commit_hash},{filedir},{filename},code,{code_lines}\n"
                 )
