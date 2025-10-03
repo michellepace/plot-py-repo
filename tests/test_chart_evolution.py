@@ -68,3 +68,33 @@ def test_prepare_data_uses_latest_commit_when_multiple_commits_same_date() -> No
     assert len(result) == 2
     assert result[result["category"] == "Source Code"]["line_count"].to_numpy()[0] == 150
     assert result[result["category"] == "Test Code"]["line_count"].to_numpy()[0] == 250
+
+
+def test_prepare_data_retains_unmatched_rows_in_other_category() -> None:
+    """Rows that don't match known categories should be aggregated under 'Other'."""
+    df = pd.DataFrame(
+        {
+            "commit_date": ["2024-01-01T10:00:00"] * 4,
+            "commit_id": ["abc123"] * 4,
+            "filedir": ["src", "tests", "docs", "lib"],
+            "filename": ["main.py", "test_main.py", "guide.py", "util.py"],
+            "category": ["code", "code", "code", "code"],
+            "line_count": [100, 200, 50, 75],
+        }
+    )
+
+    result = _prepare_data(df)
+
+    # Should have 3 categories: Source Code, Test Code, and Other
+    categories = result["category"].tolist()
+    assert "Source Code" in categories
+    assert "Test Code" in categories
+    assert "Other" in categories
+    assert len(result) == 3
+
+    # Check line counts
+    assert result[result["category"] == "Source Code"]["line_count"].to_numpy()[0] == 100
+    assert result[result["category"] == "Test Code"]["line_count"].to_numpy()[0] == 200
+    assert (
+        result[result["category"] == "Other"]["line_count"].to_numpy()[0] == 125
+    )  # 50 + 75

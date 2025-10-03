@@ -46,7 +46,7 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
         df["category"] == "docstrings_comments",
     ]
     choices = ["Source Code", "Test Code", "Docstrings/Comments"]
-    df["display_category"] = pd.Series(dtype=str)
+    df["display_category"] = "Other"
 
     for condition, choice in zip(conditions, choices, strict=True):
         df.loc[condition, "display_category"] = choice
@@ -65,7 +65,8 @@ def _calculate_category_order(df_prepared: pd.DataFrame) -> list[str]:
         List of category names sorted by total lines, largest first
     """
     category_totals = df_prepared.groupby("category")["line_count"].sum()
-    return category_totals.sort_values(ascending=False).index.tolist()
+    sorted_series = category_totals.sort_values(ascending=False)  # type: ignore[call-overload]
+    return [str(cat) for cat in sorted_series.index.tolist()]
 
 
 def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
