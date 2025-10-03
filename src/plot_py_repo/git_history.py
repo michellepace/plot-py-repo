@@ -2,7 +2,6 @@
 
 import subprocess
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 
 from .count_lines import classify_lines
@@ -12,14 +11,15 @@ class GitError(Exception):
     """Raised when Git operations fail."""
 
 
-def get_commits(repo_path: str) -> list[tuple[str, int]]:
+def get_commits(repo_path: str) -> list[tuple[str, str]]:
     """Get list of (commit_hash, timestamp) from Git history (newest first).
 
     Args:
         repo_path: Path to Git repository
 
     Returns:
-        List of tuples containing (commit_hash, unix_timestamp)
+        List of tuples containing (commit_hash, git_timestamp_string).
+        Timestamp format matches Git's default: "YYYY-MM-DD HH:MM:SS +ZZZZ"
 
     Raises:
         GitError: If directory is not a Git repository
@@ -27,7 +27,7 @@ def get_commits(repo_path: str) -> list[tuple[str, int]]:
     try:
         output = (
             subprocess.check_output(
-                ["/usr/bin/git", "log", "--format=%H %ct"],
+                ["/usr/bin/git", "log", "--format=%h %ai"],
                 cwd=repo_path,
                 stderr=subprocess.STDOUT,
             )
@@ -40,8 +40,10 @@ def get_commits(repo_path: str) -> list[tuple[str, int]]:
 
         commits = []
         for line in output.splitlines():
-            commit_hash, timestamp = line.split()
-            commits.append((commit_hash, int(timestamp)))
+            parts = line.split(maxsplit=1)
+            commit_hash = parts[0]
+            git_timestamp = parts[1]
+            commits.append((commit_hash, git_timestamp))
     except subprocess.CalledProcessError as e:
         error_msg = e.output.decode() if e.output else ""
         if "not a git repository" in error_msg.lower():
@@ -90,12 +92,10 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
     lines_written = 0
 
     with output_file.open("w", encoding="utf-8") as f:
-        f.write("timestamp,commit_id,filedir,filename,category,line_count\n")
+        f.write("commit_date,commit_id,filedir,filename,category,line_count\n")
         lines_written += 1
 
-        for commit_hash, timestamp in commits:
-            dt = datetime.fromtimestamp(timestamp, tz=UTC).isoformat()
-
+        for commit_hash, git_timestamp in commits:
             try:
                 tree_output = (
                     subprocess.check_output(  # noqa: S603
@@ -130,7 +130,7 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                 if not filedir:
                     continue
 
-                simplified_name = file_path.removeprefix(f"{filedir}/")
+                filename = Path(file_path).name
 
                 try:
                     content_output = subprocess.check_output(  # noqa: S603
@@ -145,12 +145,13 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                 doc_lines, comm_lines, code_lines = classify_lines(content)
                 doc_comm_lines = doc_lines + comm_lines
 
-                # Write rows (include even if 0)
+                # Write rows with timestamp format: "YYYY-MM-DD HH:MM:SS +ZZZZ"
+                # (include even if 0)
                 f.write(
-                    f"{dt},{commit_hash},{filedir},{simplified_name},code,{code_lines}\n"
+                    f"{git_timestamp},{commit_hash},{filedir},{filename},code,{code_lines}\n"
                 )
                 f.write(
-                    f"{dt},{commit_hash},{filedir},{simplified_name},docstrings_comments,{doc_comm_lines}\n"
+                    f"{git_timestamp},{commit_hash},{filedir},{filename},docstrings_comments,{doc_comm_lines}\n"
                 )
                 lines_written += 2
 

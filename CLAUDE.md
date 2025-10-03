@@ -18,14 +18,20 @@ This file provides guidance to Claude Code when working with code in this reposi
 ## Core Architecture
 
 **Data Flow:**
-- CLI → git_history (traverse commits → calls count_lines → writes CSV)
-- CLI → visualise (reads CSV → generates both charts)
+- CLI → `git_history.generate_csv()` (traverse commits → calls count_lines → writes CSV)
+- CLI → `visualise.create_charts()` (orchestrates chart generation)
+  - `_load_and_exclude_files()` → filters CSV data
+  - `chart_evolution.create()` → generates evolution chart
+  - `chart_breakdown.create()` → generates breakdown chart
 
 **Key Modules:**
 - `cli.py`: CLI entry point (simple single-command interface)
 - `git_history.py`: Traverses Git commits, extracts files, calls count_lines, writes CSV
 - `count_lines.py`: Pure utility: classifies Python source lines (no I/O)
-- `visualise.py`: Reads CSV, creates both evolution and module charts
+- `visualise.py`: Orchestrator: loads/filters CSV, delegates to chart modules
+- `chart_evolution.py`: Creates stacked area chart showing evolution over time
+- `chart_breakdown.py`: Creates horizontal bar chart showing file breakdown
+- `theme.py`: Centralised Plotly theming (layout settings)
 
 ## Commands
 
