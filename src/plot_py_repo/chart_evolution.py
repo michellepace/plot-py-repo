@@ -22,8 +22,8 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     """Transform granular commit data into aggregated chart categories by date.
 
-    Extracts dates from commit_date column, maps raw categories to display categories,
-    then groups and sums line counts:
+    Extracts dates from commit_date column, filters to latest commit per date,
+    maps raw categories to display categories, then groups and sums line counts:
     - src + code → "Source Code"
     - tests + code → "Test Code"
     - docstrings_comments → "Docstrings/Comments"
@@ -32,7 +32,12 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
         DataFrame with columns: date, category, line_count (one row per date/category)
     """
     df = df.copy()
-    df["date"] = pd.to_datetime(df["commit_date"]).dt.date
+    df["timestamp"] = pd.to_datetime(df["commit_date"])
+    df["date"] = df["timestamp"].dt.date
+
+    # Filter to latest commit per date
+    latest_per_date = df.groupby("date")["timestamp"].max().reset_index()
+    df = df.merge(latest_per_date, on=["date", "timestamp"], how="inner")
 
     # Map raw categories to display categories
     conditions = [
