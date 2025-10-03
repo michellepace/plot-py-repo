@@ -13,7 +13,7 @@ def test_load_and_exclude_files_single_filename(tmp_path: Path) -> None:
     csv_path = tmp_path / "test_history.csv"
     df = pd.DataFrame(
         {
-            "timestamp": [
+            "commit_date": [
                 "2024-01-01T10:00:00",
                 "2024-01-01T10:00:00",
                 "2024-01-01T10:00:00",
@@ -43,7 +43,7 @@ def test_load_and_exclude_files_multiple_filenames(tmp_path: Path) -> None:
     csv_path = tmp_path / "test_history.csv"
     df = pd.DataFrame(
         {
-            "timestamp": ["2024-01-01T10:00:00"] * 4,
+            "commit_date": ["2024-01-01T10:00:00"] * 4,
             "commit_id": ["abc123"] * 4,
             "filedir": ["src"] * 4,
             "filename": ["module.py", "__init__.py", "horse.py", "main.py"],

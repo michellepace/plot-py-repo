@@ -28,7 +28,7 @@ cli.py
               ├─ filter out __init__.py → filtered_df
               │
               ├──> _plot_evolution(filtered_df, path)
-              │      │ • Extract dates from timestamps
+              │      │ • Extract dates from commit_date column
               │      │ • Group by date (keep last commit per day)
               │      │ • Aggregate into 3 categories:
               │      │     - Source Code (src + code)
@@ -40,7 +40,7 @@ cli.py
               │      └─ fig.write_image(path)
               │
               └──> _plot_modules(filtered_df, path)
-                     │ • Filter to latest commit (max timestamp)
+                     │ • Filter to latest commit (max commit_date)
                      │ • Group by filedir + filename, sum line_count
                      │ • Create module path display
                      │ • Sort by line count ascending

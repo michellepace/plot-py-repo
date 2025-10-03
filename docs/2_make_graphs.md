@@ -5,7 +5,7 @@ I have a UV-managed Python project with Git commit history logged to `my_repo_hi
 
 ## CSV Data Structure
 ```csv
-timestamp,commit_id,filedir,filename,category,line_count
+commit_date,commit_id,filedir,filename,category,line_count
 2025-09-28T15:18:49+02:00,7537888b6cc73e55cf04b41e8c53bfec9ba522a4,src,youtube_to_xml/cli.py,code,119
 2025-09-28T15:18:49+02:00,7537888b6cc73e55cf04b41e8c53bfec9ba522a4,src,youtube_to_xml/cli.py,docstrings_comments,55
 ```
@@ -45,8 +45,8 @@ timestamp,commit_id,filedir,filename,category,line_count
 
 **Data Processing Notes:**
 - **Filter out `__init__.py` files** - Exclude rows where `filename` is `__init__.py` (minimal lines, creates noise)
-- Extract date only from `timestamp` column (e.g., "2025-09-28")
-- For days with multiple commits, take the LAST commit (most recent timestamp) as the daily snapshot
+- Extract date only from `commit_date` column (e.g., "2025-09-28")
+- For days with multiple commits, take the LAST commit (most recent commit_date) as the daily snapshot
 - Group by date and category, sum `line_count` for each category
 - Result: One data point per day showing repository state at end of that day
 - Your repo spans ~8 weeks (Aug 6 - Sept 30), so expect ~42 daily data points
@@ -55,7 +55,7 @@ timestamp,commit_id,filedir,filename,category,line_count
 **File:** `scripts/plot_modules.py`
 
 **Requirements:**
-- Static view of latest commit only (most recent `timestamp`)
+- Static view of latest commit only (most recent `commit_date`)
 - Horizontal bar chart of line counts per module
 - **Y-axis:** Module filenames (e.g., `tests/test_cli.py`, `src/youtube_to_xml/cli.py`)
   - Sort descending by total lines (largest modules at top)
@@ -74,7 +74,7 @@ timestamp,commit_id,filedir,filename,category,line_count
 
 **Data Processing Notes:**
 - **Filter out `__init__.py` files** - Exclude rows where `filename` is `__init__.py` (minimal lines, creates noise)
-- Filter to latest `timestamp` only
+- Filter to latest `commit_date` only
 - Group by `filename` and sum `line_count` across both categories
 - Concatenate `filedir` + `/` + `filename` for full path display
 
@@ -95,7 +95,7 @@ For each graph script:
 ```python
 import plotly.express as px
 
-fig = px.area(df, x='timestamp', y='line_count', color='category')
+fig = px.area(df, x='commit_date', y='line_count', color='category')
 fig.update_layout(template='plotly_white', title='My Chart')
 fig.write_image("evolution.webp", width=1600, height=900, scale=2)
 ```

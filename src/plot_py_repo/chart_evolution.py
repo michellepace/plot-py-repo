@@ -22,7 +22,7 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     """Transform granular commit data into aggregated chart categories by date.
 
-    Extracts dates from timestamps, maps raw categories to display categories,
+    Extracts dates from commit_date column, maps raw categories to display categories,
     then groups and sums line counts:
     - src + code → "Source Code"
     - tests + code → "Test Code"
@@ -32,7 +32,7 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
         DataFrame with columns: date, category, line_count (one row per date/category)
     """
     df = df.copy()
-    df["date"] = pd.to_datetime(df["timestamp"]).dt.date
+    df["date"] = pd.to_datetime(df["commit_date"]).dt.date
 
     # Map raw categories to display categories
     conditions = [

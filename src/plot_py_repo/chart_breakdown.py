@@ -22,8 +22,8 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     """Transform commit data into file-level line counts for latest commit."""
     # Filter to latest commit only
-    latest_timestamp = df["timestamp"].max()
-    df_latest = df[df["timestamp"] == latest_timestamp].copy()
+    latest_commit_date = df["commit_date"].max()
+    df_latest = df[df["commit_date"] == latest_commit_date].copy()
 
     # Group by filedir and filename, sum across categories
     df_modules = (

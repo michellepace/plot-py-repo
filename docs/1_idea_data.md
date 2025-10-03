@@ -7,7 +7,7 @@ Visualise this project repo so I can "tell a visual story" via two images (graph
 ## Graphs
 
 ### Graph 1: Stacked Area Chart (Evolution Over Time)
-This chart visualises the growth and shrinkage of the Python application across Git commits. It employs a stacked area format with the x-axis representing commit timestamps (aggregated to daily or weekly intervals for clarity, if desired) and the y-axis indicating total non-blank line counts. The stacks consist of three layers: the bottom layer (e.g., dark green) for aggregated code lines from files in the `tests/` directory, the middle layer (e.g., dark blue) for aggregated code lines from files in the `src/` directory, and the top layer (e.g., light gray) for aggregated docstrings and comments across both directories. This design highlights trends, such as refactoring impacts, while excluding blank lines to focus on meaningful content. For instance, on a given date, it might display 2,000 test code lines, 1,000 source code lines, and 500 docstring/comment lines, totaling 3,500 non-blank lines.
+This chart visualises the growth and shrinkage of the Python application across Git commits. It employs a stacked area format with the x-axis representing commit dates (aggregated to daily or weekly intervals for clarity, if desired) and the y-axis indicating total non-blank line counts. The stacks consist of three layers: the bottom layer (e.g., dark green) for aggregated code lines from files in the `tests/` directory, the middle layer (e.g., dark blue) for aggregated code lines from files in the `src/` directory, and the top layer (e.g., light gray) for aggregated docstrings and comments across both directories. This design highlights trends, such as refactoring impacts, while excluding blank lines to focus on meaningful content. For instance, on a given date, it might display 2,000 test code lines, 1,000 source code lines, and 500 docstring/comment lines, totaling 3,500 non-blank lines.
 
 ### Graph 2: Vertical Bar Chart (Final Module Breakdown)
 This chart presents a static view of the final (latest commit) line counts per Python module, sorted descending by total lines for emphasis on the largest contributors. It uses a vertical bar format with the y-axis listing module filenames (e.g., `tests/test_utils.py`, `src/main.py`) and the x-axis showing non-blank line counts per module, excluding blank lines. Bars are colored to distinguish categories: dark green for modules in the `tests/` directory and dark blue for those in the `src/` directory. Labels appear alongside each bar for readability, enabling quick identification of heavyweight modules without interactivity.
@@ -21,13 +21,13 @@ All Git commits, scanning Python files in `src/` and `tests/` directories only.
 To facilitate processing with Pandas and Plotly Express:
 
 ```text
-timestamp,commit_id,filedir,filename,category,line_count
+commit_date,commit_id,filedir,filename,category,line_count
 2025-10-01T12:00:00Z,abc123def456,src,cli.py,code,500
 2025-10-01T12:00:00Z,abc123def456,src,cli.py,docstrings_comments,100
 2025-10-01T12:00:00Z,abc123def456,tests,test_cli.py,code,30
 ```
 
-This structure is complete and supports both graphs efficiently. It includes `timestamp` and `commit_id` for temporal flexibility (e.g., daily or weekly aggregation for the stacked chart), `filedir` for quick categorisation, `filename` for module-level granularity in the bar chart, `category` to separate code from docstrings/comments, and `line_count` for the actual metric.
+This structure is complete and supports both graphs efficiently. It includes `commit_date` and `commit_id` for temporal flexibility (e.g., daily or weekly aggregation for the stacked chart), `filedir` for quick categorisation, `filename` for module-level granularity in the bar chart, `category` to separate code from docstrings/comments, and `line_count` for the actual metric.
 
 ### Existing Script To Count Lines
 
