@@ -43,12 +43,11 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         x="line_count",
         color="filedir",
         title="Repository Breakdown by File (current state)",
-        labels={"filename": "", "line_count": "Lines of Code", "filedir": "Type"},
+        labels={"filename": "", "line_count": "Lines of Code"},
         text="line_count",
         orientation="h",
         category_orders={"filename": df_prepared["filename"].tolist()},
     )
 
     apply_common_layout(fig)
-
     fig.write_image(str(output_path), scale=2)

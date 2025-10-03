@@ -73,10 +73,9 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         y="line_count",
         color="category",
         title="Repository Growth Over Time",
-        labels={"date": "Date", "line_count": "Lines of Code", "category": "Category"},
+        labels={"date": "", "line_count": "Lines of Code"},
         category_orders={"category": category_order},
     )
 
     apply_common_layout(fig)
-
     fig.write_image(str(output_path), scale=2)

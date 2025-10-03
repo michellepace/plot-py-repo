@@ -7,6 +7,15 @@ DEFAULT_LAYOUT = {
     "template": "plotly_white",
     "width": 1600,
     "height": 900,
+    # Legend positioned horizontally at top right, above chart area
+    "legend": {
+        "orientation": "h",
+        "yanchor": "bottom",
+        "y": 1.02,
+        "xanchor": "right",
+        "x": 1.0,
+        "title_text": "",
+    },
 }
 
 
