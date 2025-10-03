@@ -1,6 +1,6 @@
 # ARCHITECTURE 3 - Complete and Accurate Against Codebase as of `2025-10-02`.
 
-```
+```text
 cli.py
   │
   │ (arg parsing: repo_path, --csv, --output-dir)
@@ -43,7 +43,7 @@ theme.py ✅ (CENTRALISED THEMING)
 
 ## DATAFRAME FLOW
 
-```
+```text
 CSV file → _load_and_exclude_files() ✅ → filtered_df
                                                       │
                                                       ├──> chart_evolution.create(df, path) ✅

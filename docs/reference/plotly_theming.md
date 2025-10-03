@@ -1,10 +1,10 @@
 # PLOTLY: Theming and templates in Python
 
-Source: https://plotly.com/python/templates/
+Source: <https://plotly.com/python/templates/>
 
 Theming and templates with plotly with Python
 
-### Theming and templates [¶](https://plotly.com/python/templates/\#Theming-and-templates)
+## Theming and templates [¶](https://plotly.com/python/templates/\#Theming-and-templates)
 
 The Plotly Python library comes pre-loaded with several themes that you can get started using right away, and it also provides support for creating and registering your own themes.
 
@@ -392,7 +392,7 @@ pio.templates.default = "draft"
 ...
 ```
 
-> Note: In order for the import to succeed, the `my_themes.py` file must be on Python's module search path. See https://docs.python.org/3/tutorial/modules.html#the-module-search-path for more information.
+> Note: In order for the import to succeed, the `my_themes.py` file must be on Python's module search path. See <https://docs.python.org/3/tutorial/modules.html#the-module-search-path> for more information.
 
 ## Examining built-in themes
 It may be useful to examine the contents and structure of the built-in templates when creating your own custom templates. The `Template` graph object for a registered template can be loaded using dictionary-style key access on the `plotly.io.templates` configuration object. Here is an example of loading the `Template` graph object for the `"plotly"` template, and then displaying the value of the template's `layout` property.
