@@ -7,13 +7,8 @@ cli.py
   │
   └──> visualise.py (ORCHESTRATOR) ✅
          │
-         ├─ _load_and_exclude_files(csv_path, filenames) ✅
-         │    • Read CSV once
-         │    • Exclude rows with specified filenames
-         │    • Return filtered DataFrame
-         │
          └─ create_charts(csv_path, output_dir) ✅
-               │ Calls _load_and_exclude_files()
+               │ Loads CSV, filters data, delegates to chart modules
                │
                ├──> chart_evolution.py ✅
                │      └─ create(df, output_path)
@@ -43,14 +38,13 @@ theme.py ✅ (CENTRALISED THEMING)
 ## DATAFRAME FLOW
 
 ```text
-CSV file → _load_and_exclude_files() ✅ → filtered_df
-                                                      │
-                                                      ├──> chart_evolution.create(df, path) ✅
-                                                      ├──> chart_breakdown.create(df, path) ✅
-                                                      └──> 🎯 chart_example.create(df, path)
+CSV file → visualise.create_charts() → filtered_df
+                                              │
+                                              ├──> chart_evolution.create(df, path) ✅
+                                              ├──> chart_breakdown.create(df, path) ✅
+                                              └──> 🎯 chart_example.create(df, path)
 ```
 
 **Established patterns:**
 - `visualise.py` orchestrates but contains no chart logic
-- Data loading/filtering centralised in `_load_and_exclude_files()`
 - Each chart module follows: `create()` → `_prepare_data()` → `_plot_and_save()`

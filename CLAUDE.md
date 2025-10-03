@@ -19,10 +19,8 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 **Data Flow:**
 - CLI → `git_history.generate_csv()` (traverse commits → calls count_lines → writes CSV)
-- CLI → `visualise.create_charts()` (orchestrates chart generation)
-  - `_load_and_exclude_files()` → filters CSV data
-  - `chart_evolution.create()` → generates evolution chart
-  - `chart_breakdown.create()` → generates breakdown chart
+- CLI → `visualise.create_charts()` (loads CSV, filters data, delegates to chart modules)
+  - Calls `chart_*.create()` modules following consistent pattern
 
 **Key Modules:**
 - `cli.py`: CLI entry point (simple single-command interface)
