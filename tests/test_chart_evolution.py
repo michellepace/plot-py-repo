@@ -66,8 +66,8 @@ def test_prepare_data_uses_latest_commit_when_multiple_commits_same_date() -> No
 
     # Should have latest commit only: Source Code=150, Test Code=250
     assert len(result) == 2
-    assert result[result["category"] == "Source Code"]["line_count"].iloc[0] == 150
-    assert result[result["category"] == "Test Code"]["line_count"].iloc[0] == 250
+    assert result[result["category"] == "Source Code"]["line_count"].item() == 150
+    assert result[result["category"] == "Test Code"]["line_count"].item() == 250
 
 
 def test_prepare_data_retains_unmatched_rows_in_other_category() -> None:
@@ -93,6 +93,6 @@ def test_prepare_data_retains_unmatched_rows_in_other_category() -> None:
     assert len(result) == 3
 
     # Check line counts
-    assert result[result["category"] == "Source Code"]["line_count"].iloc[0] == 100
-    assert result[result["category"] == "Test Code"]["line_count"].iloc[0] == 200
-    assert result[result["category"] == "Other"]["line_count"].iloc[0] == 125  # 50 + 75
+    assert result[result["category"] == "Source Code"]["line_count"].item() == 100
+    assert result[result["category"] == "Test Code"]["line_count"].item() == 200
+    assert result[result["category"] == "Other"]["line_count"].item() == 125  # 50 + 75

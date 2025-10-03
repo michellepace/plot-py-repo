@@ -15,6 +15,12 @@ repos:
 
   - repo: local
     hooks:
+      - id: pyright
+        name: pyright
+        entry: uv run pyright
+        language: system
+        types: [python]
+        pass_filenames: false
       - id: pytest
         name: pytest
         entry: uv run pytest
@@ -25,4 +31,4 @@ repos:
 # Notes:
 # 1. `uv-lock` hook automatically updates the lockfile to ensure it matches specs in pyproject.toml
 # 2. `--exit-non-zero-on-fix` flag blocks commits when ruff makes automatic fixes, must review first
-# 3. `pass_filenames`: false` makes pytest run all tests rather than only testing modified files
+# 3. `pass_filenames: false` makes pytest and pyright run on all files rather than only modified files
