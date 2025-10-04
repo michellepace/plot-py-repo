@@ -1,6 +1,6 @@
-# ARCHITECTURE 2 (CURRENT)
+# ARCHITECTURE 2 (OUTDATED / STALE!)
 
-```
+```text
 cli.py
   │
   │ (arg parsing: repo_path, --csv, --output-dir)
@@ -71,17 +71,20 @@ count_lines.py (PURE UTILITY - no I/O)
 ## KEY CHARACTERISTICS
 
 **Monolithic Visualisation:**
+
 - Single `visualise.py` file with two internal plotting functions
 - Each function independently handles data preparation AND plotting
 - Colors and layouts hardcoded in each function (DUPLICATED)
 - No shared theming or configuration
 
 **CSV Generation:**
+
 - Git history traversal in `git_history.py`
 - Calls pure utility `classify_lines()` from `count_lines.py`
 - Writes CSV with 2 rows per file per commit (code, docstrings_comments)
 
 **Current Limitations:**
+
 - Adding new chart types requires editing `visualise.py` directly
 - Color scheme and layout settings duplicated across functions
 - No clear separation between data prep and plotting logic

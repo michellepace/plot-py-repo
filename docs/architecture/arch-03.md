@@ -1,4 +1,4 @@
-# ARCHITECTURE 3 - Complete and Accurate Against Codebase as of `2025-10-02`.
+# ARCHITECTURE 3 - Complete and Accurate Against Codebase as of `2025-10-04`
 
 ```text
 cli.py
@@ -46,5 +46,6 @@ CSV file → visualise.create_charts() → filtered_df
 ```
 
 **Established patterns:**
+
 - `visualise.py` orchestrates but contains no chart logic
 - Each chart module follows: `create()` → `_prepare_data()` → `_plot_and_save()`
