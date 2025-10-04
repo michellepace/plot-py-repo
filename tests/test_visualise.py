@@ -4,13 +4,23 @@ from pathlib import Path
 
 import pandas as pd
 
-from plot_py_repo.visualise import _load_and_exclude_files
+from plot_py_repo.visualise import _exclude_filenames, _load_csv
 
 
-def test_load_and_exclude_files_single_filename(tmp_path: Path) -> None:
-    """_load_and_exclude_files() loads CSV and excludes specified filename."""
-    # Create CSV file with test data including __init__.py
+def test_load_csv_loads_dataframe(tmp_path: Path) -> None:
+    """Loads CSV file and returns DataFrame."""
     csv_path = tmp_path / "test_history.csv"
+    df = pd.DataFrame({"col1": [1, 2], "col2": [3, 4]})
+    df.to_csv(csv_path, index=False)
+
+    result = _load_csv(str(csv_path))
+
+    assert isinstance(result, pd.DataFrame)
+    assert len(result) == 2
+
+
+def test_exclude_filenames_single() -> None:
+    """Removes rows matching single filename."""
     df = pd.DataFrame(
         {
             "commit_date": [
@@ -25,22 +35,18 @@ def test_load_and_exclude_files_single_filename(tmp_path: Path) -> None:
             "line_count": [100, 1, 50],
         }
     )
-    df.to_csv(csv_path, index=False)
 
-    # Load and exclude __init__.py
-    result = _load_and_exclude_files(str(csv_path), ["__init__.py"])
+    result = _exclude_filenames(df, ["__init__.py"])
 
-    # Verify __init__.py is filtered out
     filenames = list(result["filename"])
     assert "__init__.py" not in filenames
     assert "module.py" in filenames
     assert "test_example.py" in filenames
+    assert len(result) == 2
 
 
-def test_load_and_exclude_files_multiple_filenames(tmp_path: Path) -> None:
-    """_load_and_exclude_files() can exclude multiple filenames."""
-    # Create CSV file with multiple files to exclude
-    csv_path = tmp_path / "test_history.csv"
+def test_exclude_filenames_multiple() -> None:
+    """Removes rows matching multiple filenames."""
     df = pd.DataFrame(
         {
             "commit_date": ["2024-01-01T10:00:00"] * 4,
@@ -51,14 +57,50 @@ def test_load_and_exclude_files_multiple_filenames(tmp_path: Path) -> None:
             "line_count": [100, 1, 50, 75],
         }
     )
-    df.to_csv(csv_path, index=False)
 
-    # Load and exclude multiple files
-    result = _load_and_exclude_files(str(csv_path), ["__init__.py", "horse.py"])
+    result = _exclude_filenames(df, ["__init__.py", "horse.py"])
 
-    # Verify both files are filtered out
     filenames = list(result["filename"])
     assert "__init__.py" not in filenames
     assert "horse.py" not in filenames
     assert "module.py" in filenames
     assert "main.py" in filenames
+    assert len(result) == 2
+
+
+def test_exclude_filenames_empty_list_returns_all_rows() -> None:
+    """Empty exclusion list returns all rows unchanged."""
+    df = pd.DataFrame(
+        {
+            "commit_date": ["2024-01-01T10:00:00"] * 2,
+            "commit_id": ["abc123"] * 2,
+            "filedir": ["src"] * 2,
+            "filename": ["module.py", "__init__.py"],
+            "category": ["code"] * 2,
+            "line_count": [100, 1],
+        }
+    )
+
+    result = _exclude_filenames(df, [])
+
+    assert len(result) == len(df)
+    assert list(result["filename"]) == ["module.py", "__init__.py"]
+
+
+def test_exclude_filenames_nonexistent_filename_returns_all_rows() -> None:
+    """Non-existent filename in exclusion list returns all rows."""
+    df = pd.DataFrame(
+        {
+            "commit_date": ["2024-01-01T10:00:00"] * 2,
+            "commit_id": ["abc123"] * 2,
+            "filedir": ["src"] * 2,
+            "filename": ["module.py", "main.py"],
+            "category": ["code"] * 2,
+            "line_count": [100, 50],
+        }
+    )
+
+    result = _exclude_filenames(df, ["nonexistent.py"])
+
+    assert len(result) == len(df)
+    assert list(result["filename"]) == ["module.py", "main.py"]

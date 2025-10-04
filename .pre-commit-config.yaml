@@ -4,17 +4,26 @@ repos:
     hooks:
       - id: uv-lock
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.2
-    hooks:
-      # Run the linter
-      - id: ruff-check
-        args: [--fix, --exit-non-zero-on-fix]
-      # Run the formatter  
-      - id: ruff-format
-
   - repo: local
     hooks:
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix --exit-non-zero-on-fix
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: pyright
+        name: pyright
+        entry: uv run pyright
+        language: system
+        types: [python]
+        pass_filenames: false
       - id: pytest
         name: pytest
         entry: uv run pytest
@@ -23,6 +32,9 @@ repos:
         pass_filenames: false
 
 # Notes:
-# 1. `uv-lock` hook automatically updates the lockfile to ensure it matches specs in pyproject.toml
-# 2. `--exit-non-zero-on-fix` flag blocks commits when ruff makes automatic fixes, must review first
-# 3. `pass_filenames`: false` makes pytest run all tests rather than only testing modified files
+# 1. Hook order: uv-lock (instant) → ruff-format (auto-fix) → ruff-check (validate) → pyright (type check) → pytest (slowest)
+# 2. `uv-lock` validates lockfile matches pyproject.toml (official Astral hook)
+# 3. All other tools use `uv run` for single source of truth (pyproject.toml versions)
+# 4. `ruff-format` runs before `ruff-check` so linting validates formatted code
+# 5. `--exit-non-zero-on-fix` blocks commits when ruff-check auto-fixes, forcing review
+# 6. `pass_filenames: false` runs tools on entire codebase for consistency

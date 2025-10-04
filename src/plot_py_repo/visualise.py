@@ -7,16 +7,21 @@ import pandas as pd
 from . import chart_breakdown, chart_evolution
 
 
-def _load_and_exclude_files(csv_path: str, filenames: list[str]) -> pd.DataFrame:
-    """Load CSV and exclude rows where filename is in filenames list."""
-    df = pd.read_csv(csv_path)
+def _load_csv(csv_path: str) -> pd.DataFrame:
+    """Load CSV history file."""
+    return pd.read_csv(csv_path)
+
+
+def _exclude_filenames(df: pd.DataFrame, filenames: list[str]) -> pd.DataFrame:
+    """Remove rows where filename matches any in the exclusion list."""
     mask = ~df["filename"].isin(filenames)
     return df.loc[mask].copy()
 
 
 def create_charts(csv_path: str, output_dir: str) -> None:
     """Create evolution and breakdown visualisation WebP images from CSV history."""
-    filtered_df = _load_and_exclude_files(csv_path, ["__init__.py"])
+    df = _load_csv(csv_path)
+    filtered_df = _exclude_filenames(df, ["__init__.py"])
 
     # Generate both charts
     output_path = Path(output_dir)
