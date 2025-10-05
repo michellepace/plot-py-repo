@@ -10,6 +10,7 @@
 **Decision taken:** Both 1B + 2B (Wide CSV format + Blanks counted as code)
 
 **Changes implemented:**
+
 - CSV structure changed to wide format with derived columns
 - Terminology: `executable_lines` → `code_lines` (includes blanks)
 - All tests and documentation updated
