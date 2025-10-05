@@ -23,12 +23,14 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     """Transform granular commit data into aggregated chart categories by date.
 
-    Extracts dates from commit_date column, filters to latest commit per date,
-    uses melt() to transform wide format to long format with display categories:
-    - code_lines + src → "Source Code"
-    - code_lines + tests → "Test Code"
-    - code_lines + other → "Other"
-    - documentation_lines → "Documentation"
+    Process:
+    1. Extracts dates from commit_date, filters to latest commit per date
+    2. Melts wide format (code_lines, documentation_lines columns) to long format
+    3. Categorizes each row based on line_type and filedir:
+       - documentation_lines (any dir) → "Documentation"
+       - code_lines + src → "Source Code"
+       - code_lines + tests → "Test Code"
+       - code_lines + other → "Other"
 
     Returns:
         DataFrame with columns: date, category, line_count (one row per date/category)
