@@ -28,60 +28,60 @@
 
 ```python
 classify_lines(content: str) -> tuple[int, int, int]
-# Returns: (docstring_lines, comment_lines, executable_lines)
+# Returns: (docstring_lines, comment_lines, code_lines)
 ```
 
 **Internal processing:**
 
 ```python
 classif = ["pending", "docstring", "executable", "comment", "blank", ...]
-# Lines classified as "blank" are NOT included in return tuple
+# Lines classified as "blank" ARE included in code_lines count
 ```
 
 **Verified with `horse.py` (39 total lines):**
 
 ```python
-classify_lines(horse_content) → (10, 3, 15)
-# 10 docstrings + 3 comments + 15 executable = 28 lines counted
-# 39 - 28 = 11 blank lines EXCLUDED
+classify_lines(horse_content) → (10, 3, 26)
+# 10 docstrings + 3 comments + 26 code_lines (15 executable + 11 blanks) = 39 lines counted
+# 26 + 13 = 39 ✓
 ```
 
 ### Current CSV Structure (`git_history.py`)
 
-**Format:** Long/pivoted (2 rows per file)
+**Format:** Wide/flat (1 row per file)
 
 **Header:**
 
 ```csv
-commit_date,commit_id,filedir,filename,category,line_count
+commit_date,commit_id,filedir,filename,code_lines,docstring_lines,comment_lines,total_lines,documentation_lines
 ```
 
 **Example rows:**
 
 ```csv
-2025-09-30 23:47:26 +0200,83036f2,src,cli.py,executable,15
-2025-09-30 23:47:26 +0200,83036f2,src,cli.py,documentation,13
+2025-09-30 23:47:26 +0200,83036f2,src,cli.py,26,10,3,39,13
 ```
 
-**Aggregation logic (git_history.py:145-146):**
+**Column calculation logic:**
 
 ```python
-docstring_lines, comment_lines, executable_lines = classify_lines(content)
-documentation_lines = docstring_lines + comment_lines  # ← Pre-aggregation
+docstring_lines, comment_lines, code_lines = classify_lines(content)
+total_lines = len(content.splitlines())
+documentation_lines = docstring_lines + comment_lines
 ```
 
 ### Current Chart Requirements
 
 **`chart_evolution.py`** - Stacked area chart over time
 
-- Uses `df["category"] == "executable"` (split by src/tests)
-- Uses `df["category"] == "documentation"`
+- Uses `code_lines` column (split by src/tests)
+- Uses `documentation_lines` column
 - Maps to 3 display categories: "Source Code", "Test Code", "Documentation"
 
 **`chart_breakdown.py`** - Horizontal bar by file
 
-- Sums ALL categories: `groupby(["filedir", "filename"])["line_count"].sum()`
-- Doesn't care about category split
+- Uses `total_lines` column: `groupby(["filedir", "filename"])["total_lines"].sum()`
+- Total equals: `code_lines + documentation_lines`
 
 ---
 
@@ -93,14 +93,14 @@ documentation_lines = docstring_lines + comment_lines  # ← Pre-aggregation
 
 ```csv
 commit_date,commit_id,filedir,filename,category,line_count
-2025-09-30...,83036f2,src,cli.py,executable,15
+2025-09-30...,83036f2,src,cli.py,code,26
 2025-09-30...,83036f2,src,cli.py,documentation,13
 ```
 
 **Characteristics:**
 
 - 2 rows per file
-- Categories: `executable`, `documentation`
+- Categories: `code`, `documentation`
 - Pre-aggregated in `git_history.py`
 
 **Pros:**
@@ -122,14 +122,14 @@ commit_date,commit_id,filedir,filename,category,line_count
 **Structure:**
 
 ```csv
-commit_date,commit_id,filedir,filename,docstring_lines,comment_lines,executable_lines,documentation_lines,total_lines
-2025-09-30...,83036f2,src,cli.py,10,3,15,13,28
+commit_date,commit_id,filedir,filename,code_lines,docstring_lines,comment_lines,total_lines,documentation_lines
+2025-09-30...,83036f2,src,cli.py,26,10,3,39,13
 ```
 
 **Characteristics:**
 
 - 1 row per file (50% fewer rows)
-- Raw counts preserved: `docstring_lines, comment_lines, executable_lines`
+- Raw counts preserved: `docstring_lines, comment_lines, code_lines`
 - Derived columns for convenience: `documentation_lines, total_lines`
 
 **Implementation changes:**
@@ -137,63 +137,64 @@ commit_date,commit_id,filedir,filename,docstring_lines,comment_lines,executable_
 **`git_history.py` (lines 145-156):**
 
 ```python
-# Current
-docstring_lines, comment_lines, executable_lines = classify_lines(content)
+# Old (long format)
+docstring_lines, comment_lines, code_lines = classify_lines(content)
 documentation_lines = docstring_lines + comment_lines
-f.write(f"...executable,{executable_lines}\n")
+f.write(f"...code,{code_lines}\n")
 f.write(f"...documentation,{documentation_lines}\n")
 
-# Proposed
-docstring_lines, comment_lines, executable_lines = classify_lines(content)
+# Implemented (wide format)
+docstring_lines, comment_lines, code_lines = classify_lines(content)
 total_lines = len(content.splitlines())
 documentation_lines = docstring_lines + comment_lines
-f.write(f"...{docstring_lines},{comment_lines},{executable_lines},{documentation_lines},{total_lines}\n")
+f.write(f"...{code_lines},{docstring_lines},{comment_lines},{total_lines},{documentation_lines}\n")
 ```
 
-**`chart_evolution.py` (_prepare_data, add one line):**
+**`chart_evolution.py` (_prepare_data, implemented approach):**
 
 ```python
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    # NEW: Create aggregated column from raw columns
-    df["category"] = "executable"  # Default
-    df.loc[df["documentation_lines"] > 0, "category"] = "documentation"
-    df["line_count"] = df["executable_lines"]
-    df.loc[df["category"] == "documentation", "line_count"] = df["documentation_lines"]
+    # Works directly with wide format columns
+    # Uses code_lines and documentation_lines columns
+    # Applies src/tests split logic
+    # Returns aggregated data for plotting
 
-    # Rest of existing logic unchanged...
+    # Rest of existing logic uses code_lines column...
 ```
 
-**Alternative simpler approach for chart_evolution:**
+**Alternative approach (pivot wide → long):**
 
 ```python
 # Create long-format subset from wide format
-df_exec = df[["commit_date", "commit_id", "filedir", "filename", "executable_lines"]].copy()
-df_exec["category"] = "executable"
-df_exec["line_count"] = df_exec["executable_lines"]
+df_code = df[["commit_date", "commit_id", "filedir", "filename", "code_lines"]].copy()
+df_code["category"] = "code"
+df_code["line_count"] = df_code["code_lines"]
 
 df_docs = df[["commit_date", "commit_id", "filedir", "filename", "documentation_lines"]].copy()
 df_docs["category"] = "documentation"
 df_docs["line_count"] = df_docs["documentation_lines"]
 
-df_long = pd.concat([df_exec, df_docs], ignore_index=True)
+df_long = pd.concat([df_code, df_docs], ignore_index=True)
 # Continue with existing logic on df_long
 ```
 
-**`chart_breakdown.py` (minimal change):**
+**`chart_breakdown.py` (implemented):**
 
 ```python
-# Current
+# Old (long format)
 df_modules = df_latest.groupby(["filedir", "filename"])["line_count"].sum()
 
-# Proposed
-df_latest["total_lines"] = (
-    df_latest["docstring_lines"] +
-    df_latest["comment_lines"] +
-    df_latest["executable_lines"]
+# Implemented (wide format calculates total from components)
+df_latest["line_count"] = (
+    df_latest["docstring_lines"]
+    + df_latest["comment_lines"]
+    + df_latest["code_lines"]
 )
-df_modules = df_latest.groupby(["filedir", "filename"])["total_lines"].sum()
+df_files = df_latest.loc[:, ["filedir", "filename", "line_count"]].copy()
+
+# Note: Functionally equivalent to using total_lines column from CSV
 ```
 
 **Pros:**
@@ -220,7 +221,7 @@ df_modules = df_latest.groupby(["filedir", "filename"])["total_lines"].sum()
 **Behavior:**
 
 ```python
-classify_lines(content) → (docstring_lines, comment_lines, executable_lines_excluding_blanks)
+classify_lines(content) → (docstring_lines, comment_lines, code_lines_excluding_blanks)
 # Blanks tracked internally but not returned
 ```
 
@@ -230,7 +231,7 @@ classify_lines(content) → (docstring_lines, comment_lines, executable_lines_ex
 Total: 39 lines
 Docstrings: 10
 Comments: 3
-Executable: 15 (actual executable code only)
+Code: 15 (actual executable code only)
 Blanks: 11 (EXCLUDED)
 Sum: 28 ≠ 39
 ```
@@ -244,7 +245,7 @@ Sum: 28 ≠ 39
 
 - ❌ Counts don't add up to total (`sum ≠ total_lines`)
 - ❌ More complex mental model
-- ❌ Less aligned with common interpretation ("lines of executable code")
+- ❌ Less aligned with common interpretation ("lines of code")
 - ❌ Requires separate blank line tracking if needed
 
 ---
@@ -254,8 +255,8 @@ Sum: 28 ≠ 39
 **Behavior:**
 
 ```python
-classify_lines(content) → (docstring_lines, comment_lines, executable_lines_including_blanks)
-# Everything that isn't docstrings/comments = executable
+classify_lines(content) → (docstring_lines, comment_lines, code_lines_including_blanks)
+# Everything that isn't docstrings/comments = code
 ```
 
 **Verified example (horse.py):**
@@ -264,14 +265,14 @@ classify_lines(content) → (docstring_lines, comment_lines, executable_lines_in
 Total: 39 lines
 Docstrings: 10
 Comments: 3
-Executable: 26 (15 actual + 11 blanks)
+Code: 26 (15 actual + 11 blanks)
 Sum: 39 = 39 ✓
 ```
 
 **Equation:**
 
 ```text
-executable_lines + documentation_lines = total_lines
+code_lines + documentation_lines = total_lines
 26 + 13 = 39 ✓
 ```
 
@@ -279,14 +280,14 @@ executable_lines + documentation_lines = total_lines
 
 ```python
 # count_lines.py (line 119-123)
-# Current
+# Old
 return (
     classif.count("docstring"),
     classif.count("comment"),
     classif.count("executable"),  # Excludes blanks
 )
 
-# Proposed
+# Implemented
 return (
     classif.count("docstring"),
     classif.count("comment"),
@@ -295,38 +296,38 @@ return (
 ```
 
 **Mental model:**
-> "If I remove all docstrings and comments from this file, what's left is executable code"
+> "If I remove all docstrings and comments from this file, what's left is code"
 
 **Pros:**
 
-- ✅ Simple equation: `executable + documentation = total`
-- ✅ Intuitive interpretation: "lines of executable code in the file"
-- ✅ Aligned with common usage: "this file has 100 lines of executable code"
+- ✅ Simple equation: `code_lines + documentation_lines = total_lines`
+- ✅ Intuitive interpretation: "lines of code in the file"
+- ✅ Aligned with common usage: "this file has 100 lines of code"
 - ✅ Counts add up cleanly (easier to verify)
 - ✅ No need to track blanks separately
 
 **Cons:**
 
-- ❌ Includes blank lines in "executable" count
+- ❌ Includes blank lines in "code" count
 - ❌ More sensitive to formatting style (ruff strict adds consistent blanks)
-- ❌ Less precise definition of "actual executable code"
+- ❌ Less precise definition of "actual code"
 
 **Semantic consideration:**
 
-- User's use case: distinguish "real executable code" from documentation
+- User's use case: distinguish "real code" from documentation
 - Primary metric: src vs tests code volume (both include blanks equally)
-- Blanks are part of executable code structure (function/class spacing)
+- Blanks are part of code structure (function/class spacing)
 
 ---
 
 ## Combined Impact Matrix
 
-| Decision 1 (CSV) | Decision 2 (Blanks) | CSV Total Lines | Equation | Recommendation |
+| Decision 1 (CSV) | Decision 2 (Blanks) | CSV Total Lines | Equation | Status |
 |-----------------|---------------------|-----------------|----------|----------------|
-| Long (current) | Exclude (current) | 28 | ❌ sum ≠ total | Status quo |
-| Long | Include | 39 | ✓ sum = total | Partial fix |
-| Wide | Exclude | 28 | ❌ sum ≠ total | Inconsistent |
-| Wide | Include | 39 | ✓ sum = total | ⭐ **Recommended** |
+| Long (old) | Exclude (old) | 28 | ❌ sum ≠ total | Deprecated |
+| Long | Include | 39 | ✓ sum = total | Not implemented |
+| Wide | Exclude | 28 | ❌ sum ≠ total | Not implemented |
+| Wide | Include | 39 | ✓ sum = total | ⭐ **Implemented** |
 
 ---
 
@@ -346,11 +347,11 @@ return (
 5. **Sanity checking:** `total_lines` column enables verification
 
 **User's stated goal:**
-> "Distinguish how many lines of *real* executable code was written, classified by tests/*.py and src/*.py"
+> "Distinguish how many lines of *real* code was written, classified by tests/*.py and src/*.py"
 
-- Both src and tests will include blanks equally (fair comparison)
-- Blank spacing is part of executable code structure (ruff enforces this)
-- Primary metric is executable vs documentation, not blanks vs non-blanks
+- Both src and tests include blanks equally (fair comparison)
+- Blank spacing is part of code structure (ruff enforces this)
+- Primary metric is code vs documentation, not blanks vs non-blanks
 
 ---
 
@@ -361,35 +362,35 @@ return (
 **If implementing both 1B + 2B:**
 
 1. **`src/plot_py_repo/count_lines.py`**
-   - [ ] Line 119-123: Include blanks in executable count
-   - [ ] Update docstring to reflect new behavior
-   - [ ] Function still returns 3-tuple (same signature)
+   - [x] Line 119-123: Include blanks in code_lines count
+   - [x] Update docstring to reflect new behavior
+   - [x] Function still returns 3-tuple (same signature)
 
 2. **`src/plot_py_repo/git_history.py`**
-   - [ ] Line 95: Update CSV header to wide format
-   - [ ] Lines 145-156: Write 1 row per file with 5 columns
-   - [ ] Calculate `total_lines = len(content.splitlines())`
-   - [ ] Add sanity check: `assert doc + comm + executable == total`
+   - [x] Line 95: Update CSV header to wide format
+   - [x] Lines 145-156: Write 1 row per file with 5 columns
+   - [x] Calculate `total_lines = len(content.splitlines())`
+   - [x] Add sanity check: `assert doc + comm + code == total`
 
 3. **`src/plot_py_repo/chart_evolution.py`**
-   - [ ] `_prepare_data()`: Create `category` and `line_count` from raw columns
-   - [ ] OR: Pivot wide → long format at start of function
+   - [x] `_prepare_data()`: Uses `code_lines` and `documentation_lines` columns
+   - [x] Works directly with wide format
 
 4. **`src/plot_py_repo/chart_breakdown.py`**
-   - [ ] `_prepare_data()`: Use `total_lines` column or sum 3 columns
+   - [x] `_prepare_data()`: Uses `total_lines` column
 
 5. **`tests/test_count_lines.py`**
-   - [ ] Update all assertions: executable count increases by blank count
-   - [ ] `test_classify_lines_comprehensive`: Update expected executable from 15 to 26
-   - [ ] All other tests: Recalculate expected executable counts
+   - [x] Update all assertions: code_lines count includes blanks
+   - [x] `test_classify_lines_comprehensive`: Updated expected code_lines to 26
+   - [x] All other tests: Recalculated expected code_lines counts
 
 6. **`tests/test_git_history.py`**
-   - [ ] Update CSV parsing to match new column structure
-   - [ ] May need to add tests for new columns
+   - [x] Update CSV parsing to match new column structure
+   - [x] Tests for new wide format columns
 
 7. **Documentation**
-   - [ ] Update `CLAUDE.md` if CSV structure is documented
-   - [ ] Update `docs/architecture/arch-03.md` if data flow described
+   - [x] Updated `CLAUDE.md` with CSV structure
+   - [x] Updated architecture documentation
 
 ### Data Migration
 
@@ -401,61 +402,63 @@ return (
 
 ### Validation Steps
 
-1. [ ] Run `uv run pytest tests/test_count_lines.py -v`
-2. [ ] Run `uv run pytest tests/test_git_history.py -v`
-3. [ ] Generate fresh CSV: `uv run plot-py-repo`
-4. [ ] Verify CSV structure: check header and sample rows
-5. [ ] Verify equation: `executable_lines + documentation_lines == total_lines`
-6. [ ] Generate charts and verify visual output
-7. [ ] Run full test suite: `uv run pytest`
+1. [x] Run `uv run pytest tests/test_count_lines.py -v`
+2. [x] Run `uv run pytest tests/test_git_history.py -v`
+3. [x] Generate fresh CSV: `uv run plot-py-repo`
+4. [x] Verify CSV structure: check header and sample rows
+5. [x] Verify equation: `code_lines + documentation_lines == total_lines`
+6. [x] Generate charts and verify visual output
+7. [x] Run full test suite: `uv run pytest`
 
 ---
 
-## Alternative: Incremental Approach
+## ~~Alternative: Incremental Approach~~ (Not used)
 
-If uncertain, implement in stages:
+~~If uncertain, implement in stages:~~
 
-**Stage 1:** Decision 2B only (blanks as executable)
+**~~Stage 1:~~** ~~Decision 2B only (blanks as code)~~
 
-- Simpler change (1 file: `count_lines.py`)
-- Clean equation immediately
-- CSV stays long format (easier migration)
+- ~~Simpler change (1 file: `count_lines.py`)~~
+- ~~Clean equation immediately~~
+- ~~CSV stays long format (easier migration)~~
 
-**Stage 2:** Decision 1B (flatten CSV)
+**~~Stage 2:~~** ~~Decision 1B (flatten CSV)~~
 
-- Once confident in blank line treatment
-- Adds flexibility for future charts
-- Can be done independently
+- ~~Once confident in blank line treatment~~
+- ~~Adds flexibility for future charts~~
+- ~~Can be done independently~~
+
+**Note:** Both changes implemented together as single refactor.
 
 ---
 
 ## Decision Criteria Summary
 
-**Choose 1B + 2B if:**
+**✅ Implemented: 1B + 2B**
 
-- You value data integrity and clean equations
-- You want flexibility for future charts
-- You're willing to update 3-4 files
-- Simple mental model matters ("executable = non-doc/comment")
+- ✅ Data integrity and clean equations
+- ✅ Flexibility for future charts
+- ✅ Updated 4 files successfully
+- ✅ Simple mental model ("code_lines = non-doc/comment")
 
-**Keep current (1A + 2A) if:**
+**~~Keep current (1A + 2A)~~** (Deprecated)
 
-- Current behavior meets all needs
-- You want to avoid any changes
-- Precise "actual executable code" definition matters more than simplicity
+- ~~Current behavior meets all needs~~
+- ~~You want to avoid any changes~~
+- ~~Precise "actual code" definition matters more than simplicity~~
 
-**Hybrid (1A + 2B) if:**
+**~~Hybrid (1A + 2B)~~** (Not implemented)
 
-- You want clean equations but minimal code changes
-- Long format CSV is acceptable
-- Good stepping stone to full implementation
+- ~~You want clean equations but minimal code changes~~
+- ~~Long format CSV is acceptable~~
+- ~~Good stepping stone to full implementation~~
 
 ---
 
-**Next Steps:** Review this document, make decision, then update `test_count_lines.py` accordingly.
+**✅ Completed:** All changes implemented and validated.
 
 **Related Files:**
 
 - `flatten_csv_perhaps.md` (earlier analysis)
-- `tests/test_count_lines.py` (needs updating after decision)
+- `tests/test_count_lines.py` (updated)
 - `docs/architecture/arch-03.md` (architecture reference)

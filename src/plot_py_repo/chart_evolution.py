@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import cast
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -43,10 +44,6 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     latest_per_date = df.groupby("date")["timestamp"].max().reset_index()
     df = df.merge(latest_per_date, on=["date", "timestamp"], how="inner")
 
-    # Calculate documentation_lines if not present
-    if "documentation_lines" not in df.columns:
-        df["documentation_lines"] = df["docstring_lines"] + df["comment_lines"]
-
     # Transform wide format to long format using melt
     df_long = df.melt(
         id_vars=["date", "filedir"],
@@ -55,32 +52,19 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
         value_name="line_count",
     )
 
-    # Map line type and directory to display categories
-    df_long["category"] = df_long.apply(_categorize_row, axis=1)
+    # Map line type and directory to display categories (vectorized)
+    conditions = [
+        df_long["line_type"] == "documentation_lines",
+        (df_long["line_type"] == "code_lines") & (df_long["filedir"] == "src"),
+        (df_long["line_type"] == "code_lines") & (df_long["filedir"] == "tests"),
+    ]
+    choices = ["Documentation", "Source Code", "Test Code"]
+    df_long["category"] = np.select(conditions, choices, default="Other")
 
     # Aggregate by date and category
     result = df_long.groupby(["date", "category"], as_index=False)["line_count"].sum()
 
     return cast("pd.DataFrame", result)
-
-
-def _categorize_row(row: pd.Series) -> str:
-    """Map line type and directory to display category.
-
-    Args:
-        row: DataFrame row with 'line_type' and 'filedir' columns
-
-    Returns:
-        Display category: 'Documentation', 'Source Code', 'Test Code', or 'Other'
-    """
-    if row["line_type"] == "documentation_lines":
-        return "Documentation"
-    # Code lines categorized by directory
-    if row["filedir"] == "src":
-        return "Source Code"
-    if row["filedir"] == "tests":
-        return "Test Code"
-    return "Other"
 
 
 def _calculate_category_order(df_prepared: pd.DataFrame) -> list[str]:
