@@ -1,4 +1,4 @@
-commit_date,commit_id,filedir,filename,executable_lines,docstring_lines,comment_lines,total_lines,documentation_lines
+commit_date,commit_id,filedir,filename,code_lines,docstring_lines,comment_lines,total_lines,documentation_lines
 2025-09-30 23:47:26 +0200,83036f2,src,__init__.py,0,1,0,1,1
 2025-09-30 23:47:26 +0200,83036f2,src,cli.py,152,45,6,203,51
 2025-09-30 23:47:26 +0200,83036f2,src,exceptions.py,192,43,6,241,49

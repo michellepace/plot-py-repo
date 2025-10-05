@@ -93,7 +93,7 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
 
     with output_file.open("w", encoding="utf-8") as f:
         f.write(
-            "commit_date,commit_id,filedir,filename,executable_lines,docstring_lines,"
+            "commit_date,commit_id,filedir,filename,code_lines,docstring_lines,"
             "comment_lines,total_lines,documentation_lines\n"
         )
         lines_written += 1
@@ -145,7 +145,7 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                     # Silently skip files that can't be read
                     continue
 
-                docstring_lines, comment_lines, executable_lines = classify_lines(content)
+                docstring_lines, comment_lines, code_lines = classify_lines(content)
                 documentation_lines = docstring_lines + comment_lines
                 total_lines = len(content.splitlines())
 
@@ -153,7 +153,7 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                 #  (timestamp format: "YYYY-MM-DD HH:MM:SS +ZZZZ")
                 f.write(
                     f"{git_timestamp},{commit_hash},{filedir},{filename},"
-                    f"{executable_lines},{docstring_lines},{comment_lines},"
+                    f"{code_lines},{docstring_lines},{comment_lines},"
                     f"{total_lines},{documentation_lines}\n"
                 )
                 lines_written += 1

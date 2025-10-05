@@ -24,10 +24,11 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     """Transform granular commit data into aggregated chart categories by date.
 
     Extracts dates from commit_date column, filters to latest commit per date,
-    transforms wide format to long format with display categories:
-    - src + executable → "Source Code"
-    - tests + executable → "Test Code"
-    - documentation → "Documentation"
+    uses melt() to transform wide format to long format with display categories:
+    - code_lines + src → "Source Code"
+    - code_lines + tests → "Test Code"
+    - code_lines + other → "Other"
+    - documentation_lines → "Documentation"
 
     Returns:
         DataFrame with columns: date, category, line_count (one row per date/category)
@@ -44,26 +45,40 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     if "documentation_lines" not in df.columns:
         df["documentation_lines"] = df["docstring_lines"] + df["comment_lines"]
 
-    # Create long format by splitting into executable and documentation
-    # Executable lines by filedir
-    df_exec = df.loc[:, ["date", "filedir", "executable_lines"]].copy()
-    df_exec["category"] = "Other"
-    df_exec.loc[df["filedir"] == "src", "category"] = "Source Code"
-    df_exec.loc[df["filedir"] == "tests", "category"] = "Test Code"
-    df_exec["line_count"] = df_exec["executable_lines"]
-    df_exec = df_exec.loc[:, ["date", "category", "line_count"]]
+    # Transform wide format to long format using melt
+    df_long = df.melt(
+        id_vars=["date", "filedir"],
+        value_vars=["code_lines", "documentation_lines"],
+        var_name="line_type",
+        value_name="line_count",
+    )
 
-    # Documentation lines (all combined)
-    df_docs = df.loc[:, ["date", "documentation_lines"]].copy()
-    df_docs["category"] = "Documentation"
-    df_docs["line_count"] = df_docs["documentation_lines"]
-    df_docs = df_docs.loc[:, ["date", "category", "line_count"]]
+    # Map line type and directory to display categories
+    df_long["category"] = df_long.apply(_categorize_row, axis=1)
 
-    # Combine and group by date and category
-    df_combined = pd.concat([df_exec, df_docs], ignore_index=True)
-    result = df_combined.groupby(["date", "category"], as_index=False)["line_count"].sum()
+    # Aggregate by date and category
+    result = df_long.groupby(["date", "category"], as_index=False)["line_count"].sum()
 
     return cast("pd.DataFrame", result)
+
+
+def _categorize_row(row: pd.Series) -> str:
+    """Map line type and directory to display category.
+
+    Args:
+        row: DataFrame row with 'line_type' and 'filedir' columns
+
+    Returns:
+        Display category: 'Documentation', 'Source Code', 'Test Code', or 'Other'
+    """
+    if row["line_type"] == "documentation_lines":
+        return "Documentation"
+    # Code lines categorized by directory
+    if row["filedir"] == "src":
+        return "Source Code"
+    if row["filedir"] == "tests":
+        return "Test Code"
+    return "Other"
 
 
 def _calculate_category_order(df_prepared: pd.DataFrame) -> list[str]:

@@ -90,9 +90,9 @@ def test_csv_flag_generates_images_from_existing_csv(tmp_path: Path) -> None:
     # Create a sample CSV file with wide format
     csv_file = tmp_path / "sample.csv"
     csv_file.write_text(
-        "commit_date,commit_id,filedir,filename,docstring_lines,comment_lines,"
-        "executable_lines,documentation_lines,total_lines\n"
-        "2025-01-01T00:00:00+00:00,abc123,src,example.py,3,2,10,5,15\n"
+        "commit_date,commit_id,filedir,filename,code_lines,docstring_lines,"
+        "comment_lines,total_lines,documentation_lines\n"
+        "2025-01-01T00:00:00+00:00,abc123,src,example.py,10,3,2,15,5\n"
     )
 
     output_dir = tmp_path / "output"

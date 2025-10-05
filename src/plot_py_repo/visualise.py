@@ -8,7 +8,11 @@ from . import chart_breakdown, chart_evolution
 
 
 def _load_csv(csv_path: str) -> pd.DataFrame:
-    """Load CSV history file."""
+    """Load CSV history file containing Git commit metrics.
+
+    Expected columns: commit_date, commit_id, filedir, filename,
+    code_lines, docstring_lines, comment_lines, total_lines, documentation_lines.
+    """
     return pd.read_csv(csv_path)
 
 
@@ -23,7 +27,6 @@ def create_charts(csv_path: str, output_dir: str) -> None:
     df = _load_csv(csv_path)
     filtered_df = _exclude_filenames(df, ["__init__.py"])
 
-    # Generate both charts
     output_path = Path(output_dir)
     chart_evolution.create(filtered_df, output_path / "repo_evolution.webp")
     chart_breakdown.create(filtered_df, output_path / "repo_breakdown.webp")

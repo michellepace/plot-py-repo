@@ -20,7 +20,7 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
             "filename": ["module.py", "test_module.py"],
             "docstring_lines": [10, 5],
             "comment_lines": [5, 3],
-            "executable_lines": [100, 50],
+            "code_lines": [100, 50],
         }
     )
     output_path = tmp_path / "modules.webp"
@@ -45,7 +45,7 @@ def test_prepare_data_filters_to_latest_commit_only() -> None:
             "filename": ["main.py", "test_main.py", "main.py", "test_main.py"],
             "docstring_lines": [10, 20, 15, 25],
             "comment_lines": [5, 10, 8, 12],
-            "executable_lines": [100, 200, 150, 250],
+            "code_lines": [100, 200, 150, 250],
         }
     )
 
@@ -69,7 +69,7 @@ def test_prepare_data_sums_across_categories_per_file() -> None:
             "filename": ["main.py", "test_main.py"],
             "docstring_lines": [15, 8],
             "comment_lines": [5, 2],
-            "executable_lines": [100, 50],  # main.py total=120, test_main.py total=60
+            "code_lines": [100, 50],  # main.py total=120, test_main.py total=60
         }
     )
 
@@ -92,7 +92,7 @@ def test_prepare_data_sorts_by_line_count_descending() -> None:
             "filename": ["small.py", "large.py", "medium.py"],
             "docstring_lines": [5, 30, 15],
             "comment_lines": [3, 20, 10],
-            "executable_lines": [50, 300, 150],
+            "code_lines": [50, 300, 150],
         }
     )
 

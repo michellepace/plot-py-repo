@@ -1,11 +1,15 @@
-# ARCHITECTURE 3 - Complete and Accurate Against Codebase as of `2025-10-04`
+# ARCHITECTURE 3 - Complete and Accurate Against Codebase as of `2025-10-05`
+
+## EXECUTION FLOW
 
 ```text
-cli.py
+cli.py (arg parsing: repo_path, --csv, --output-dir)
   │
-  │ (arg parsing: repo_path, --csv, --output-dir)
+  ├──> [Normal Mode] git_history.py ✅
+  │      └─ generate_csv(repo_path, output_dir) → CSV file
+  │           Traverses commits, counts lines, writes CSV
   │
-  └──> visualise.py (ORCHESTRATOR) ✅
+  └──> [Both Modes] visualise.py (ORCHESTRATOR) ✅
          │
          └─ create_charts(csv_path, output_dir) ✅
                │ Loads CSV, filters data, delegates to chart modules
@@ -20,7 +24,7 @@ cli.py
                ├──> chart_breakdown.py ✅
                │      └─ create(df, output_path)
                │           ├─ _prepare_data(df) → df_prepared
-               │           │    Filter to latest commit, group by file
+               │           │    Filter to latest commit, calculate totals per file
                │           └─ _plot_and_save(df_prepared, path)
                │                Horizontal bar chart with theme
                │
@@ -35,14 +39,19 @@ theme.py ✅ (CENTRALISED THEMING)
   • Chart modules import and call directly (not injected as parameter)
 ```
 
-## DATAFRAME FLOW
+## DATA FLOW
 
 ```text
-CSV file → visualise.create_charts() → filtered_df
-                                              │
-                                              ├──> chart_evolution.create(df, path) ✅
-                                              ├──> chart_breakdown.create(df, path) ✅
-                                              └──> 🎯 chart_example.create(df, path)
+git_history.generate_csv()
+  ↓
+CSV file
+  ↓
+visualise.create_charts()
+  ↓
+filtered_df
+  ├──> chart_evolution.create(df, path) ✅
+  ├──> chart_breakdown.create(df, path) ✅
+  └──> 🎯 chart_example.create(df, path)
 ```
 
 **Established patterns:**
