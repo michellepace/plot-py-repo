@@ -90,14 +90,16 @@ commit_date,commit_id,filedir,filename,category,line_count
 - Pre-aggregated in `git_history.py`
 
 **Pros:**
-✅ Already implemented and working
-✅ Optimized for `chart_evolution.py` (primary chart)
-✅ Follows "tidy data" principle (one observation per row)
+
+- ✅ Already implemented and working
+- ✅ Optimized for `chart_evolution.py` (primary chart)
+- ✅ Follows "tidy data" principle (one observation per row)
 
 **Cons:**
-❌ Permanent loss of granularity (can't separate docstrings from comments)
-❌ Future charts limited to existing category split
-❌ Misalignment with `count_lines.py` output structure
+
+- ❌ Permanent loss of granularity (can't separate docstrings from comments)
+- ❌ Future charts limited to existing category split
+- ❌ Misalignment with `count_lines.py` output structure
 
 ---
 
@@ -181,17 +183,19 @@ df_modules = df_latest.groupby(["filedir", "filename"])["total_lines"].sum()
 ```
 
 **Pros:**
-✅ CSV matches `count_lines.py` structure (data integrity)
-✅ Raw data preserved for future flexibility
-✅ Derived columns provide convenience (`docstrings_and_comments` available)
-✅ Fewer CSV rows (1 per file instead of 2)
-✅ Future charts can create different aggregations
-✅ Sanity checking: `total_lines` verifies data integrity
+
+- ✅ CSV matches `count_lines.py` structure (data integrity)
+- ✅ Raw data preserved for future flexibility
+- ✅ Derived columns provide convenience (`docstrings_and_comments` available)
+- ✅ Fewer CSV rows (1 per file instead of 2)
+- ✅ Future charts can create different aggregations
+- ✅ Sanity checking: `total_lines` verifies data integrity
 
 **Cons:**
-❌ Requires updating 3 files (`git_history.py`, both chart modules)
-❌ Chart code slightly more complex (minimal)
-❌ All existing CSV files need regeneration (acceptable per user)
+
+- ❌ Requires updating 3 files (`git_history.py`, both chart modules)
+- ❌ Chart code slightly more complex (minimal)
+- ❌ All existing CSV files need regeneration (acceptable per user)
 
 ---
 
@@ -218,14 +222,16 @@ Sum: 28 ≠ 39
 ```
 
 **Pros:**
-✅ More precise definition of "code"
-✅ Separates blank formatting from actual code
+
+- ✅ More precise definition of "code"
+- ✅ Separates blank formatting from actual code
 
 **Cons:**
-❌ Counts don't add up to total (`sum ≠ total_lines`)
-❌ More complex mental model
-❌ Less aligned with common interpretation ("lines of code")
-❌ Requires separate blank line tracking if needed
+
+- ❌ Counts don't add up to total (`sum ≠ total_lines`)
+- ❌ More complex mental model
+- ❌ Less aligned with common interpretation ("lines of code")
+- ❌ Requires separate blank line tracking if needed
 
 ---
 
@@ -278,16 +284,18 @@ return (
 > "If I remove all docstrings and comments from this file, what's left is code"
 
 **Pros:**
-✅ Simple equation: `code + docstrings_and_comments = total`
-✅ Intuitive interpretation: "lines of code in the file"
-✅ Aligned with common usage: "this file has 100 lines of code"
-✅ Counts add up cleanly (easier to verify)
-✅ No need to track blanks separately
+
+- ✅ Simple equation: `code + docstrings_and_comments = total`
+- ✅ Intuitive interpretation: "lines of code in the file"
+- ✅ Aligned with common usage: "this file has 100 lines of code"
+- ✅ Counts add up cleanly (easier to verify)
+- ✅ No need to track blanks separately
 
 **Cons:**
-❌ Includes blank lines in "code" count
-❌ More sensitive to formatting style (ruff strict adds consistent blanks)
-❌ Less precise definition of "actual executable code"
+
+- ❌ Includes blank lines in "code" count
+- ❌ More sensitive to formatting style (ruff strict adds consistent blanks)
+- ❌ Less precise definition of "actual executable code"
 
 **Semantic consideration:**
 
