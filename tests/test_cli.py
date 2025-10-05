@@ -91,8 +91,8 @@ def test_csv_flag_generates_images_from_existing_csv(tmp_path: Path) -> None:
     csv_file = tmp_path / "sample.csv"
     csv_file.write_text(
         "commit_date,commit_id,filedir,filename,category,line_count\n"
-        "2025-01-01T00:00:00+00:00,abc123,src,example.py,code,10\n"
-        "2025-01-01T00:00:00+00:00,abc123,src,example.py,docstrings_comments,5\n"
+        "2025-01-01T00:00:00+00:00,abc123,src,example.py,executable,10\n"
+        "2025-01-01T00:00:00+00:00,abc123,src,example.py,documentation,5\n"
     )
 
     output_dir = tmp_path / "output"

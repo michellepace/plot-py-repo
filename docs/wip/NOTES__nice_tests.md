@@ -6,6 +6,10 @@
 
 ---
 
+> **Note:** This document uses historical terminology (`code_cnt`, `code_lines`) from before the terminology refactor. Current codebase uses `executable_cnt` and `executable_lines` instead.
+
+---
+
 ## 📊 Executive Summary
 
 This test suite represents **excellent testing practices** for a pure function. Your "hardest effort" has paid off — this is high-quality, well-structured test code that demonstrates strong understanding of testing fundamentals.

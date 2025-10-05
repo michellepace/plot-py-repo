@@ -43,7 +43,7 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         x="line_count",
         color="filedir",
         title="Repository Breakdown by File (current state)",
-        labels={"filename": "", "line_count": "Lines of Code"},
+        labels={"filename": "", "line_count": "Lines"},
         text="line_count",
         orientation="h",
         category_orders={"filename": df_prepared["filename"].tolist()},

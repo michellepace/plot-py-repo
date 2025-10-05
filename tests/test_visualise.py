@@ -31,7 +31,7 @@ def test_exclude_filenames_single() -> None:
             "commit_id": ["abc123", "abc123", "abc123"],
             "filedir": ["src", "src", "tests"],
             "filename": ["module.py", "__init__.py", "test_example.py"],
-            "category": ["code", "code", "code"],
+            "category": ["executable", "executable", "executable"],
             "line_count": [100, 1, 50],
         }
     )
@@ -53,7 +53,7 @@ def test_exclude_filenames_multiple() -> None:
             "commit_id": ["abc123"] * 4,
             "filedir": ["src"] * 4,
             "filename": ["module.py", "__init__.py", "horse.py", "main.py"],
-            "category": ["code"] * 4,
+            "category": ["executable"] * 4,
             "line_count": [100, 1, 50, 75],
         }
     )
@@ -76,7 +76,7 @@ def test_exclude_filenames_empty_list_returns_all_rows() -> None:
             "commit_id": ["abc123"] * 2,
             "filedir": ["src"] * 2,
             "filename": ["module.py", "__init__.py"],
-            "category": ["code"] * 2,
+            "category": ["executable"] * 2,
             "line_count": [100, 1],
         }
     )
@@ -95,7 +95,7 @@ def test_exclude_filenames_nonexistent_filename_returns_all_rows() -> None:
             "commit_id": ["abc123"] * 2,
             "filedir": ["src"] * 2,
             "filename": ["module.py", "main.py"],
-            "category": ["code"] * 2,
+            "category": ["executable"] * 2,
             "line_count": [100, 50],
         }
     )

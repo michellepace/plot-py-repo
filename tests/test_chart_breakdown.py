@@ -18,7 +18,7 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
             "commit_id": ["abc123", "def456"],
             "filedir": ["src", "tests"],
             "filename": ["module.py", "test_module.py"],
-            "category": ["code", "code"],
+            "category": ["executable", "executable"],
             "line_count": [100, 50],
         }
     )
@@ -42,7 +42,7 @@ def test_prepare_data_filters_to_latest_commit_only() -> None:
             "commit_id": ["abc123", "abc123", "def456", "def456"],
             "filedir": ["src", "tests", "src", "tests"],
             "filename": ["main.py", "test_main.py", "main.py", "test_main.py"],
-            "category": ["code", "code", "code", "code"],
+            "category": ["executable", "executable", "executable", "executable"],
             "line_count": [100, 200, 150, 250],
         }
     )
@@ -58,14 +58,14 @@ def test_prepare_data_filters_to_latest_commit_only() -> None:
 
 
 def test_prepare_data_sums_across_categories_per_file() -> None:
-    """Line counts summed across categories (code + docstrings_comments) for each file."""
+    """Line counts summed across categories (executable + documentation) for each file."""
     df = pd.DataFrame(
         {
             "commit_date": ["2024-01-01T10:00:00"] * 4,
             "commit_id": ["abc123"] * 4,
             "filedir": ["src", "src", "tests", "tests"],
             "filename": ["main.py", "main.py", "test_main.py", "test_main.py"],
-            "category": ["code", "docstrings_comments", "code", "docstrings_comments"],
+            "category": ["executable", "documentation", "executable", "documentation"],
             "line_count": [100, 20, 50, 10],  # main.py total=120, test_main.py total=60
         }
     )
@@ -87,7 +87,7 @@ def test_prepare_data_sorts_by_line_count_descending() -> None:
             "commit_id": ["abc123"] * 3,
             "filedir": ["src", "src", "tests"],
             "filename": ["small.py", "large.py", "medium.py"],
-            "category": ["code", "code", "code"],
+            "category": ["executable", "executable", "executable"],
             "line_count": [50, 300, 150],
         }
     )

@@ -18,7 +18,7 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
             "commit_id": ["abc123", "def456"],
             "filedir": ["src", "src"],
             "filename": ["module.py", "module.py"],
-            "category": ["code", "code"],
+            "category": ["executable", "executable"],
             "line_count": [100, 150],
         }
     )
@@ -57,7 +57,7 @@ def test_prepare_data_uses_latest_commit_when_multiple_commits_same_date() -> No
             "commit_id": ["abc123", "abc123", "def456", "def456"],
             "filedir": ["src", "tests", "src", "tests"],
             "filename": ["main.py", "test_main.py", "main.py", "test_main.py"],
-            "category": ["code", "code", "code", "code"],
+            "category": ["executable", "executable", "executable", "executable"],
             "line_count": [100, 200, 150, 250],  # Latest has 150 + 250 = 400 total
         }
     )
@@ -78,7 +78,7 @@ def test_prepare_data_retains_unmatched_rows_in_other_category() -> None:
             "commit_id": ["abc123"] * 4,
             "filedir": ["src", "tests", "docs", "lib"],
             "filename": ["main.py", "test_main.py", "guide.py", "util.py"],
-            "category": ["code", "code", "code", "code"],
+            "category": ["executable", "executable", "executable", "executable"],
             "line_count": [100, 200, 50, 75],
         }
     )
