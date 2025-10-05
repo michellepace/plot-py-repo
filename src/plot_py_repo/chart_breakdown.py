@@ -25,10 +25,15 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     latest_commit_date = df["commit_date"].max()
     df_latest = df[df["commit_date"] == latest_commit_date].copy()
 
-    # Group by filedir and filename, sum across categories
-    df_modules = (
-        df_latest.groupby(["filedir", "filename"])["line_count"].sum().reset_index()
+    # Calculate total lines for each file
+    df_latest["line_count"] = (
+        df_latest["docstring_lines"]
+        + df_latest["comment_lines"]
+        + df_latest["executable_lines"]
     )
+
+    # Select relevant columns and sort by line count descending
+    df_modules = df_latest.loc[:, ["filedir", "filename", "line_count"]].copy()
 
     # Sort by line count: largest at top for horizontal bar chart
     return df_modules.sort_values("line_count", ascending=False)
@@ -43,7 +48,7 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         x="line_count",
         color="filedir",
         title="Repository Breakdown by File (current state)",
-        labels={"filename": "", "line_count": "Lines"},
+        labels={"filename": "", "line_count": "Total Lines"},
         text="line_count",
         orientation="h",
         category_orders={"filename": df_prepared["filename"].tolist()},

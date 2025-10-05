@@ -1,6 +1,7 @@
 """Evolution chart generation for Python repository evolution."""
 
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 import plotly.express as px
@@ -23,7 +24,7 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     """Transform granular commit data into aggregated chart categories by date.
 
     Extracts dates from commit_date column, filters to latest commit per date,
-    maps raw categories to display categories, then groups and sums line counts:
+    transforms wide format to long format with display categories:
     - src + executable → "Source Code"
     - tests + executable → "Test Code"
     - documentation → "Documentation"
@@ -39,23 +40,30 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     latest_per_date = df.groupby("date")["timestamp"].max().reset_index()
     df = df.merge(latest_per_date, on=["date", "timestamp"], how="inner")
 
-    # Map raw categories to display categories
-    conditions = [
-        (df["filedir"] == "src") & (df["category"] == "executable"),
-        (df["filedir"] == "tests") & (df["category"] == "executable"),
-        df["category"] == "documentation",
-    ]
-    choices = ["Source Code", "Test Code", "Documentation"]
-    df["display_category"] = "Other"
+    # Calculate documentation_lines if not present
+    if "documentation_lines" not in df.columns:
+        df["documentation_lines"] = df["docstring_lines"] + df["comment_lines"]
 
-    for condition, choice in zip(conditions, choices, strict=True):
-        df.loc[condition, "display_category"] = choice
+    # Create long format by splitting into executable and documentation
+    # Executable lines by filedir
+    df_exec = df.loc[:, ["date", "filedir", "executable_lines"]].copy()
+    df_exec["category"] = "Other"
+    df_exec.loc[df["filedir"] == "src", "category"] = "Source Code"
+    df_exec.loc[df["filedir"] == "tests", "category"] = "Test Code"
+    df_exec["line_count"] = df_exec["executable_lines"]
+    df_exec = df_exec.loc[:, ["date", "category", "line_count"]]
 
-    return (
-        df.groupby(["date", "display_category"], as_index=False)["line_count"]
-        .sum()
-        .rename(columns={"display_category": "category"})  # type: ignore[call-overload]
-    )
+    # Documentation lines (all combined)
+    df_docs = df.loc[:, ["date", "documentation_lines"]].copy()
+    df_docs["category"] = "Documentation"
+    df_docs["line_count"] = df_docs["documentation_lines"]
+    df_docs = df_docs.loc[:, ["date", "category", "line_count"]]
+
+    # Combine and group by date and category
+    df_combined = pd.concat([df_exec, df_docs], ignore_index=True)
+    result = df_combined.groupby(["date", "category"], as_index=False)["line_count"].sum()
+
+    return cast("pd.DataFrame", result)
 
 
 def _calculate_category_order(df_prepared: pd.DataFrame) -> list[str]:
@@ -79,7 +87,7 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         y="line_count",
         color="category",
         title="Repository Growth Over Time",
-        labels={"date": "", "line_count": "Lines"},
+        labels={"date": "", "line_count": "Total Lines"},
         category_orders={"category": category_order},
     )
 

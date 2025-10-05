@@ -81,12 +81,18 @@ def _mark_comment_lines(tokens: list[tokenize.TokenInfo], classif: list[str]) ->
 def classify_lines(content: str) -> tuple[int, int, int]:
     """Classify lines in Python content as docstrings, comments, or executable.
 
+    Blank lines are counted as executable code.
+
     Args:
         content: Python source code as string
 
     Returns:
         Tuple of (docstring_lines, comment_lines, executable_lines) counts
     """
+    # Handle truly empty content (0 bytes)
+    if not content:
+        return (0, 0, 0)
+
     if not content.endswith("\n"):
         content += "\n"
 
@@ -121,9 +127,9 @@ def classify_lines(content: str) -> tuple[int, int, int]:
         if classif[i] == "pending":
             classif[i] = "blank"
 
-    # Count the categories
+    # Count the categories (blanks are included in executable count)
     return (
         classif.count("docstring"),
         classif.count("comment"),
-        classif.count("executable"),
+        classif.count("executable") + classif.count("blank"),
     )

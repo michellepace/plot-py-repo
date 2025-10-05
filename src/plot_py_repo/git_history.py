@@ -92,7 +92,10 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
     lines_written = 0
 
     with output_file.open("w", encoding="utf-8") as f:
-        f.write("commit_date,commit_id,filedir,filename,category,line_count\n")
+        f.write(
+            "commit_date,commit_id,filedir,filename,executable_lines,docstring_lines,"
+            "comment_lines,total_lines,documentation_lines\n"
+        )
         lines_written += 1
 
         for commit_hash, git_timestamp in commits:
@@ -144,16 +147,16 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
 
                 docstring_lines, comment_lines, executable_lines = classify_lines(content)
                 documentation_lines = docstring_lines + comment_lines
+                total_lines = len(content.splitlines())
 
-                # Write rows with timestamp format: "YYYY-MM-DD HH:MM:SS +ZZZZ"
-                # (include even if 0)
+                # Write single row with all columns
+                #  (timestamp format: "YYYY-MM-DD HH:MM:SS +ZZZZ")
                 f.write(
-                    f"{git_timestamp},{commit_hash},{filedir},{filename},executable,{executable_lines}\n"
+                    f"{git_timestamp},{commit_hash},{filedir},{filename},"
+                    f"{executable_lines},{docstring_lines},{comment_lines},"
+                    f"{total_lines},{documentation_lines}\n"
                 )
-                f.write(
-                    f"{git_timestamp},{commit_hash},{filedir},{filename},documentation,{documentation_lines}\n"
-                )
-                lines_written += 2
+                lines_written += 1
 
     # Check if any Python files were found
     if total_python_files == 0:

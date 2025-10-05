@@ -18,8 +18,9 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
             "commit_id": ["abc123", "def456"],
             "filedir": ["src", "tests"],
             "filename": ["module.py", "test_module.py"],
-            "category": ["executable", "executable"],
-            "line_count": [100, 50],
+            "docstring_lines": [10, 5],
+            "comment_lines": [5, 3],
+            "executable_lines": [100, 50],
         }
     )
     output_path = tmp_path / "modules.webp"
@@ -42,31 +43,33 @@ def test_prepare_data_filters_to_latest_commit_only() -> None:
             "commit_id": ["abc123", "abc123", "def456", "def456"],
             "filedir": ["src", "tests", "src", "tests"],
             "filename": ["main.py", "test_main.py", "main.py", "test_main.py"],
-            "category": ["executable", "executable", "executable", "executable"],
-            "line_count": [100, 200, 150, 250],
+            "docstring_lines": [10, 20, 15, 25],
+            "comment_lines": [5, 10, 8, 12],
+            "executable_lines": [100, 200, 150, 250],
         }
     )
 
     result = _prepare_data(df)
 
-    # Should only have latest commit data: main.py=150, test_main.py=250
+    # Should only have latest commit data: main.py total=173, test_main.py total=287
     assert len(result) == 2
     assert result.iloc[0]["filename"] == "test_main.py"
-    assert result.iloc[0]["line_count"] == 250
+    assert result.iloc[0]["line_count"] == 287  # 25 + 12 + 250
     assert result.iloc[1]["filename"] == "main.py"
-    assert result.iloc[1]["line_count"] == 150
+    assert result.iloc[1]["line_count"] == 173  # 15 + 8 + 150
 
 
 def test_prepare_data_sums_across_categories_per_file() -> None:
-    """Line counts summed across categories (executable + documentation) for each file."""
+    """Line counts summed across all line types for each file."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"] * 4,
-            "commit_id": ["abc123"] * 4,
-            "filedir": ["src", "src", "tests", "tests"],
-            "filename": ["main.py", "main.py", "test_main.py", "test_main.py"],
-            "category": ["executable", "documentation", "executable", "documentation"],
-            "line_count": [100, 20, 50, 10],  # main.py total=120, test_main.py total=60
+            "commit_date": ["2024-01-01T10:00:00"] * 2,
+            "commit_id": ["abc123"] * 2,
+            "filedir": ["src", "tests"],
+            "filename": ["main.py", "test_main.py"],
+            "docstring_lines": [15, 8],
+            "comment_lines": [5, 2],
+            "executable_lines": [100, 50],  # main.py total=120, test_main.py total=60
         }
     )
 
@@ -74,9 +77,9 @@ def test_prepare_data_sums_across_categories_per_file() -> None:
 
     assert len(result) == 2
     assert result.iloc[0]["filename"] == "main.py"
-    assert result.iloc[0]["line_count"] == 120  # 100 + 20
+    assert result.iloc[0]["line_count"] == 120  # 15 + 5 + 100
     assert result.iloc[1]["filename"] == "test_main.py"
-    assert result.iloc[1]["line_count"] == 60  # 50 + 10
+    assert result.iloc[1]["line_count"] == 60  # 8 + 2 + 50
 
 
 def test_prepare_data_sorts_by_line_count_descending() -> None:
@@ -87,18 +90,19 @@ def test_prepare_data_sorts_by_line_count_descending() -> None:
             "commit_id": ["abc123"] * 3,
             "filedir": ["src", "src", "tests"],
             "filename": ["small.py", "large.py", "medium.py"],
-            "category": ["executable", "executable", "executable"],
-            "line_count": [50, 300, 150],
+            "docstring_lines": [5, 30, 15],
+            "comment_lines": [3, 20, 10],
+            "executable_lines": [50, 300, 150],
         }
     )
 
     result = _prepare_data(df)
 
-    # Should be sorted: large.py (300), medium.py (150), small.py (50)
+    # Should be sorted: large.py (350), medium.py (175), small.py (58)
     assert len(result) == 3
     assert result.iloc[0]["filename"] == "large.py"
-    assert result.iloc[0]["line_count"] == 300
+    assert result.iloc[0]["line_count"] == 350  # 30 + 20 + 300
     assert result.iloc[1]["filename"] == "medium.py"
-    assert result.iloc[1]["line_count"] == 150
+    assert result.iloc[1]["line_count"] == 175  # 15 + 10 + 150
     assert result.iloc[2]["filename"] == "small.py"
-    assert result.iloc[2]["line_count"] == 50
+    assert result.iloc[2]["line_count"] == 58  # 5 + 3 + 50

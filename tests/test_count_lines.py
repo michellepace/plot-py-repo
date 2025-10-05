@@ -125,14 +125,14 @@ class TestCommentClassification:
     """Tests for comment detection and priority rules."""
 
     def test_standalone_comments_count_as_comments(self) -> None:
-        """Comment-only lines count as comments, not executable code."""
+        """Comment-only lines count as comments, blank line counts as executable."""
         content = "# This is a comment\n\n  # This is a second comment"
 
         docstrings_cnt, comments_cnt, executable_cnt = classify_lines(content)
 
         _assert_count("docstring line(s)", 0, docstrings_cnt)
         _assert_count("comment line(s)", 2, comments_cnt)
-        _assert_count("executable line(s)", 0, executable_cnt)
+        _assert_count("executable line(s)", 1, executable_cnt)
 
     def test_inline_comment_counts_as_executable_code(self) -> None:
         """Line with inline comment is counted as executable code, not as a comment."""
@@ -178,24 +178,41 @@ class TestBlankLineHandling:
     """Tests for blank line behavior."""
 
     def test_single_blank_line(self) -> None:
-        """Single blank line is not counted."""
+        """Single blank line counts as executable."""
         content = "\n"
 
         docstrings_cnt, comments_cnt, executable_cnt = classify_lines(content)
 
         _assert_count("docstring line(s)", 0, docstrings_cnt)
         _assert_count("comment line(s)", 0, comments_cnt)
-        _assert_count("executable line(s)", 0, executable_cnt)
+        _assert_count("executable line(s)", 1, executable_cnt)
 
     def test_blank_lines_between_executable_code_not_counted(self) -> None:
-        """Blank lines between executable code statements are not counted."""
+        """Blank lines between executable code count as executable."""
         content = "\n\nx = 1\n\n\ny = 2\n\n"
 
         docstrings_cnt, comments_cnt, executable_cnt = classify_lines(content)
 
         _assert_count("docstring line(s)", 0, docstrings_cnt)
         _assert_count("comment line(s)", 0, comments_cnt)
-        _assert_count("executable line(s)", 2, executable_cnt)
+        _assert_count("executable line(s)", 7, executable_cnt)
+
+    def test_multiple_blank_lines_count_as_executable(self) -> None:
+        """Blank lines are counted as executable code."""
+        content = """print("line 1 of 6")
+
+
+print("line 4 of 6")
+
+print("line 6 of 6")
+"""
+
+        docstrings_cnt, comments_cnt, executable_cnt = classify_lines(content)
+
+        # 6 total lines: 3 print statements + 3 blank lines
+        _assert_count("docstring line(s)", 0, docstrings_cnt)
+        _assert_count("comment line(s)", 0, comments_cnt)
+        _assert_count("executable line(s)", 6, executable_cnt)
 
 
 class TestEdgeCasesAndErrorHandling:
@@ -300,13 +317,19 @@ String literal (not docstring) line 3 of 5
         # Expected breakdown:
         # - Docstrings: 9 (module:4 + function:1 + nested:1 + class:3)
         # - Comments: 3 (comment line 1, comment inside class, final comment)
-        # - Executable: 17 (assignments:3 + function defs:2 + function body:6
-        #            + class def:1 + text assignment:5)
+        # - Executable: 28 (assignments:3 + function defs:2 + function body:6
+        #            + class def:1 + text assignment:5 + blanks:11)
 
         _assert_count("docstring line(s)", 9, docstrings_cnt)
         _assert_count("comment line(s)", 3, comments_cnt)
-        _assert_count("executable line(s)", 17, executable_cnt)
+        _assert_count("executable line(s)", 28, executable_cnt)
 
         # Verify total line count in content
         total_lines = len(content.splitlines())
         assert total_lines == 40, f"Expected 40 total lines in content, got {total_lines}"
+
+        # Verify equation: docstrings + comments + executable = total
+        sum_counts = docstrings_cnt + comments_cnt + executable_cnt
+        assert sum_counts == total_lines, (
+            f"Expected sum {sum_counts} to equal total {total_lines}"
+        )
