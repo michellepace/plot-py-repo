@@ -107,8 +107,14 @@ def classify_lines(content: str) -> tuple[int, int, int]:
         classif[line_num - 1] = "docstring"
 
     # Mark code and comment lines
-    _mark_code_lines(tokens, classif)
-    _mark_comment_lines(tokens, classif)
+    if tokens:
+        _mark_code_lines(tokens, classif)
+        _mark_comment_lines(tokens, classif)
+    else:
+        # Fallback: when tokenization fails, mark non-blank lines as code
+        for i, line in enumerate(lines):
+            if line.strip() and classif[i] == "pending":
+                classif[i] = "code"
 
     # Remaining 'pending' are blanks
     for i in range(total_lines):
