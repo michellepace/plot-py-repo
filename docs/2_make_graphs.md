@@ -1,9 +1,11 @@
 # Instructions for Creating Plotly Express Visualization Scripts
 
 ## Context
+
 I have a UV-managed Python project with Git commit history logged to `my_repo_history.csv`. I need to create two Plotly Express graphs to visualise the evolution of my codebase.
 
 ## CSV Data Structure
+
 ```csv
 commit_date,commit_id,filedir,filename,category,line_count
 2025-09-28T15:18:49+02:00,7537888b6cc73e55cf04b41e8c53bfec9ba522a4,src,youtube_to_xml/cli.py,code,119
@@ -11,6 +13,7 @@ commit_date,commit_id,filedir,filename,category,line_count
 ```
 
 ## Project Setup
+
 - **Package Manager:** UV (never use pip/venv directly)
 - **Python Version:** 3.13+
 - **Dependencies Needed:**
@@ -23,9 +26,11 @@ commit_date,commit_id,filedir,filename,category,line_count
 ## Task: Create Graph Scripts One-by-One
 
 ### Graph 1: Stacked Area Chart (Evolution Over Time)
+
 **File:** `scripts/plot_evolution.py`
 
 **Requirements:**
+
 - Stacked area chart showing codebase growth over time
 - **X-axis:** Date (one data point per day)
   - Aggregate all commits per day - take the LAST commit of each day as the snapshot
@@ -44,6 +49,7 @@ commit_date,commit_id,filedir,filename,category,line_count
   - Professional font and spacing
 
 **Data Processing Notes:**
+
 - **Filter out `__init__.py` files** - Exclude rows where `filename` is `__init__.py` (minimal lines, creates noise)
 - Extract date only from `commit_date` column (e.g., "2025-09-28")
 - For days with multiple commits, take the LAST commit (most recent commit_date) as the daily snapshot
@@ -52,9 +58,11 @@ commit_date,commit_id,filedir,filename,category,line_count
 - Your repo spans ~8 weeks (Aug 6 - Sept 30), so expect ~42 daily data points
 
 ### Graph 2: Horizontal Bar Chart (Final Module Breakdown)
+
 **File:** `scripts/plot_modules.py`
 
 **Requirements:**
+
 - Static view of latest commit only (most recent `commit_date`)
 - Horizontal bar chart of line counts per module
 - **Y-axis:** Module filenames (e.g., `tests/test_cli.py`, `src/youtube_to_xml/cli.py`)
@@ -73,15 +81,18 @@ commit_date,commit_id,filedir,filename,category,line_count
   - Clear title
 
 **Data Processing Notes:**
+
 - **Filter out `__init__.py` files** - Exclude rows where `filename` is `__init__.py` (minimal lines, creates noise)
 - Filter to latest `commit_date` only
 - Group by `filename` and sum `line_count` across both categories
 - Concatenate `filedir` + `/` + `filename` for full path display
 
 ## Implementation Approach
+
 **Please implement Graph 1 first.** Once working, I'll ask you to implement Graph 2.
 
 For each graph script:
+
 1. Use pandas to load `my_repo_history.csv`
 2. Process data according to requirements above
 3. Create Plotly Express figure with specified styling
@@ -92,6 +103,7 @@ For each graph script:
 8. Print confirmation with file path when saved
 
 **WebP Export Example:**
+
 ```python
 import plotly.express as px
 
@@ -101,6 +113,7 @@ fig.write_image("evolution.webp", width=1600, height=900, scale=2)
 ```
 
 ## Code Quality Requirements
+
 - Follow project's TDD principles (write tests if complex logic)
 - Use pure functions where possible
 - Type hints required
@@ -108,7 +121,9 @@ fig.write_image("evolution.webp", width=1600, height=900, scale=2)
 - Follow ruff/pyright standards (see `pyproject.toml`)
 
 ## Output Format
+
 Each script should:
+
 - Be runnable via: `uv run scripts/plot_evolution.py`
 - Accept optional CLI args (e.g., output path, aggregation level)
 - Print confirmation when HTML saved
@@ -117,6 +132,7 @@ Each script should:
 ## Styling Best Practices (Applied)
 
 Based on Plotly research:
+
 - ✅ **Plotly Express preferred** - Cleaner code than graph_objects
 - ✅ **3 categories** - Optimal (research says 3-5 max)
 - ✅ **Clean templates** - `plotly_white` or `simple_white` for professional look
@@ -125,6 +141,7 @@ Based on Plotly research:
 - ✅ **High resolution** - `scale=2` for retina displays
 
 **Note on Stacked Area Charts:**
+
 - Best for showing "part-to-whole" trends over time ✅
 - Bottom layer (test code) easiest to read precisely
 - Middle/top layers harder to compare (no shared baseline)
@@ -133,4 +150,5 @@ Based on Plotly research:
 ---
 
 ## Start Command
+
 Please create `scripts/plot_evolution.py` first using the requirements above. Use pandas and plotly express. Generate a stacked area chart showing the evolution of my codebase over Git commits, and export it as a WebP image (1600x900, scale=2) with clean styling.

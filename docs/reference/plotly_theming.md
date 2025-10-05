@@ -22,7 +22,6 @@ pio.templates
 
 ```
 
-
 ```python
 Templates configuration
 -----------------------
@@ -39,7 +38,6 @@ From this, we can see that the default theme is `"plotly"`, and we can see the n
 
 All Plotly Express functions accept a `template` argument that can be set to the name of a registered theme (or to a `Template` object as discussed later in this section). Here is an example of using Plotly Express to build and display the same scatter plot with six different themes.
 
-
 ```python
 import plotly.express as px
 
@@ -53,7 +51,6 @@ for template in ["plotly", "plotly_white", "plotly_dark", "ggplot2", "seaborn", 
                      template=template, title="Gapminder 2007: '%s' theme" % template)
     fig.show()
 ```
-
 
 #### Specifying themes in graph object figures [¶](https://plotly.com/python/templates/\#Specifying-themes-in-graph-object-figures)
 
@@ -107,9 +104,11 @@ fig.show()
 ## Creating themes
 
 ### Representing themes with Template objects
+
 Themes in plotly.py are represented by instances of the Template class from the plotly.graph_objects.layout module. A Template is a graph object that contains two top-level properties: layout and data. These template properties are described in their own sections below.
 
 ### The template layout property
+
 The layout property of a template is a graph object with the exact same structure as the layout property of a figure. When you provide values for properties of the template's layout, these values will be used as the defaults in any figure that this template is applied to.
 
 Here is an example that creates a template that sets the default title font to size 24 Rockwell, and then constructs a graph object figure with this template.
@@ -157,6 +156,7 @@ fig.show()
 Note that because we built the template with a list of 3 scatter trace graph objects (one each for the diamond, square, and circle symbols), the forth scatter trace in the figure cycles around and takes on the defaults specified in the first template trace (The diamond symbol).
 
 ### Theming object tuple properties
+
 Some properties in the figure hierarchy are specified as tuples of objects. For example, the text annotations for a graph object figure can be stored as a tuple of `go.layout.Annotation` objects in the `annotations` property of the figure's layout.
 
 To use a template to configure the default properties of all of the elements in an object tuple property (e.g. `layout.annotations`), use the `*defaults` property in the template that corresponds to the tuple property (e.g. `layout.template.layout.annotationdefaults`). The `*defaults` template property should be set to a single graph object that matches the type of the elements of the corresponding tuple. The properties of this *defaults object in the template will be applied to all elements of the object tuple in the figure that the template is applied to.
@@ -181,12 +181,12 @@ fig.show()
 ```
 
 ### Including tuple elements in a theme
+
 The previous section described how to use a template to customize the default properties of tuple elements that are added to a figure that the template is applied to. This is useful for styling, for example, any annotations, shapes, or images that will eventually be added to the figure.
 
 It is also possible for a template to define tuple elements that should be included, as is, in any figure that the template is applied to. This is done by specifying a list of one or more tuple element graph objects (e.g. go.layout.Annotation objects) as the value of the corresponding tuple property in the template (e.g. at template.layout.annotations). Note that the name property of these tuple element graph objects must be set to a unique non-empty string.
 
 Here is an example that creates a template that adds a large semi-transparent "DRAFT" watermark to the middle of the figure, and constructs a figure using this template.
-
 
 ```python
 import plotly.graph_objects as go
@@ -313,6 +313,7 @@ fig.show()
 ```
 
 ## Combining themes
+
 You may have noticed that figures displayed with the custom templates defined above do not have the gray background and white gridlines that are part of the default styling of figures created with plotly.py. The reason for this is that the default styling is specified in a template named `"plotly"`, and specifying a custom template overrides the default `"plotly"` template.
 
 If you want the styling of a custom template to be applied on top of the default styling of the `"plotly"` template, then you will need to combine the custom template with the `"plotly"` template. Multiple registered templates (whether built-in or user-defined) can be combined by specifying a template string that contains multiple template names joined on "+" characters.
@@ -357,6 +358,7 @@ fig.show()
 ```
 
 ## Saving and distributing custom themes
+
 The easiest way to save and distribute a custom template is to make a `*.py` file that creates and registers the template when it is imported. Here is an example of the contents of a file called my_themes.py that creates and registers the `"draft"` template when it is imported
 
 `my_themes.py`
@@ -395,6 +397,7 @@ pio.templates.default = "draft"
 > Note: In order for the import to succeed, the `my_themes.py` file must be on Python's module search path. See <https://docs.python.org/3/tutorial/modules.html#the-module-search-path> for more information.
 
 ## Examining built-in themes
+
 It may be useful to examine the contents and structure of the built-in templates when creating your own custom templates. The `Template` graph object for a registered template can be loaded using dictionary-style key access on the `plotly.io.templates` configuration object. Here is an example of loading the `Template` graph object for the `"plotly"` template, and then displaying the value of the template's `layout` property.
 
 ```python

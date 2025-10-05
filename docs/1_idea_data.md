@@ -7,17 +7,21 @@ Visualise this project repo so I can "tell a visual story" via two images (graph
 ## Graphs
 
 ### Graph 1: Stacked Area Chart (Evolution Over Time)
+
 This chart visualises the growth and shrinkage of the Python application across Git commits. It employs a stacked area format with the x-axis representing commit dates (aggregated to daily or weekly intervals for clarity, if desired) and the y-axis indicating total non-blank line counts. The stacks consist of three layers: the bottom layer (e.g., dark green) for aggregated code lines from files in the `tests/` directory, the middle layer (e.g., dark blue) for aggregated code lines from files in the `src/` directory, and the top layer (e.g., light gray) for aggregated docstrings and comments across both directories. This design highlights trends, such as refactoring impacts, while excluding blank lines to focus on meaningful content. For instance, on a given date, it might display 2,000 test code lines, 1,000 source code lines, and 500 docstring/comment lines, totaling 3,500 non-blank lines.
 
 ### Graph 2: Vertical Bar Chart (Final Module Breakdown)
+
 This chart presents a static view of the final (latest commit) line counts per Python module, sorted descending by total lines for emphasis on the largest contributors. It uses a vertical bar format with the y-axis listing module filenames (e.g., `tests/test_utils.py`, `src/main.py`) and the x-axis showing non-blank line counts per module, excluding blank lines. Bars are colored to distinguish categories: dark green for modules in the `tests/` directory and dark blue for those in the `src/` directory. Labels appear alongside each bar for readability, enabling quick identification of heavyweight modules without interactivity.
 
 ## DATA
 
 ### Required Data Source
+
 All Git commits, scanning Python files in `src/` and `tests/` directories only.
 
 ### Required CSV Structure
+
 To facilitate processing with Pandas and Plotly Express:
 
 ```text
@@ -31,7 +35,7 @@ This structure is complete and supports both graphs efficiently. It includes `co
 
 ### Existing Script To Count Lines
 
-Proven script exists, needs modification for CSV output and Git. 
+Proven script exists, needs modification for CSV output and Git.
 
 Currently:
 
@@ -51,5 +55,6 @@ line_count_docstrings_comments:   74
 Can you explain how we can use Git and modify the script to output as CSV?
 
 Notes:
+
 - all `.py` fiels are <700 lines
 - this repo relatively speaking is small
