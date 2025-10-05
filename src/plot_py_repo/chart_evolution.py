@@ -24,9 +24,9 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
 
     Extracts dates from commit_date column, filters to latest commit per date,
     maps raw categories to display categories, then groups and sums line counts:
-    - src + code → "Source Code"
-    - tests + code → "Test Code"
-    - docstrings_comments → "Docstrings/Comments"
+    - src + executable → "Source Code"
+    - tests + executable → "Test Code"
+    - documentation → "Documentation"
 
     Returns:
         DataFrame with columns: date, category, line_count (one row per date/category)
@@ -41,11 +41,11 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Map raw categories to display categories
     conditions = [
-        (df["filedir"] == "src") & (df["category"] == "code"),
-        (df["filedir"] == "tests") & (df["category"] == "code"),
-        df["category"] == "docstrings_comments",
+        (df["filedir"] == "src") & (df["category"] == "executable"),
+        (df["filedir"] == "tests") & (df["category"] == "executable"),
+        df["category"] == "documentation",
     ]
-    choices = ["Source Code", "Test Code", "Docstrings/Comments"]
+    choices = ["Source Code", "Test Code", "Documentation"]
     df["display_category"] = "Other"
 
     for condition, choice in zip(conditions, choices, strict=True):
@@ -79,7 +79,7 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         y="line_count",
         color="category",
         title="Repository Growth Over Time",
-        labels={"date": "", "line_count": "Lines of Code"},
+        labels={"date": "", "line_count": "Lines"},
         category_orders={"category": category_order},
     )
 

@@ -142,16 +142,16 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                     # Silently skip files that can't be read
                     continue
 
-                doc_lines, comm_lines, code_lines = classify_lines(content)
-                doc_comm_lines = doc_lines + comm_lines
+                docstring_lines, comment_lines, executable_lines = classify_lines(content)
+                documentation_lines = docstring_lines + comment_lines
 
                 # Write rows with timestamp format: "YYYY-MM-DD HH:MM:SS +ZZZZ"
                 # (include even if 0)
                 f.write(
-                    f"{git_timestamp},{commit_hash},{filedir},{filename},code,{code_lines}\n"
+                    f"{git_timestamp},{commit_hash},{filedir},{filename},executable,{executable_lines}\n"
                 )
                 f.write(
-                    f"{git_timestamp},{commit_hash},{filedir},{filename},docstrings_comments,{doc_comm_lines}\n"
+                    f"{git_timestamp},{commit_hash},{filedir},{filename},documentation,{documentation_lines}\n"
                 )
                 lines_written += 2
 

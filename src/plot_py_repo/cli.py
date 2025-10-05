@@ -13,7 +13,7 @@ def main() -> None:
         description="""🦧 Visualise Python repository evolution through Git history.
 
 Analyses Git commits to track code growth over time:
- • Classifies lines as code vs docstrings/comments
+ • Classifies lines as executable code vs documentation
  • Generates CSV with line counts per file per commit
  • Creates two charts: evolution timeline and breakdown by file
  """,

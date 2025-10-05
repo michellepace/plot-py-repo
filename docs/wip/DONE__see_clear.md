@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Total tests:** 17
+**Total tests:** 19
 **Structure:** Flat list of functions
 **Problem:** "Cannot see the wood through the trees" - difficult to navigate and understand coverage
 
@@ -18,77 +18,87 @@
 **Covers:** Blank line behavior (not counted)
 **Classification:** Blank Line Handling
 
-### 3. `test_module_docstring_single_line`
+### 3. `test_blank_lines_between_executable_code_not_counted`
+
+**Covers:** Multiple blank lines between executable code statements (not counted)
+**Classification:** Blank Line Handling
+
+### 4. `test_single_line_module_docstring_counts_as_docstring`
 
 **Covers:** Module-level docstring (single line)
 **Classification:** Docstring Classification
 
-### 4. `test_module_docstring_multiline`
+### 5. `test_multiline_module_docstring_counts_as_docstring`
 
 **Covers:** Module-level docstring (multi-line, includes blank lines within)
 **Classification:** Docstring Classification
 
-### 5. `test_function_docstring`
+### 6. `test_function_docstring_counts_as_docstring`
 
 **Covers:** Function-level docstring
 **Classification:** Docstring Classification
 
-### 6. `test_async_function_docstring`
+### 7. `test_async_function_docstring_counts_as_docstring`
 
 **Covers:** Async function-level docstring
 **Classification:** Docstring Classification
 
-### 7. `test_decorator_counts_as_code`
-
-**Covers:** Decorator syntax classified as code
-**Classification:** Code Classification
-
-### 8. `test_class_docstring`
+### 8. `test_class_docstring_counts_as_docstring`
 
 **Covers:** Class-level docstring
 **Classification:** Docstring Classification
 
-### 9. `test_nested_function_docstring`
+### 9. `test_nested_function_docstrings_count_as_docstrings`
 
 **Covers:** Nested function docstrings (multiple docstrings in one file)
 **Classification:** Docstring Classification
 
-### 10. `test_standalone_comment`
+### 10. `test_standalone_comments_count_as_comments`
 
 **Covers:** Comment on its own line
 **Classification:** Comment Classification
 
-### 11. `test_inline_comment_counts_as_code`
+### 11. `test_inline_comment_counts_as_executable_code`
 
-**Covers:** **Critical distinction** - inline comments classified as code (priority rule)
+**Covers:** **Critical distinction** - inline comments classified as executable code (priority rule)
 **Classification:** Classification Priority Rules (difficult to classify - see below)
 
-### 12. `test_simple_code_statement`
+### 12. `test_executable_code_statements`
 
-**Covers:** Basic code statement
-**Classification:** Code Classification
+**Covers:** Basic executable code statement
+**Classification:** Executable Code Classification
 
-### 13. `test_string_literal_not_docstring`
+### 13. `test_decorator_counts_as_executable_code`
+
+**Covers:** Decorator syntax classified as executable code
+**Classification:** Executable Code Classification
+
+### 14. `test_string_literals_count_as_executable_code`
 
 **Covers:** String literal assigned to variable (not a docstring)
 **Classification:** Docstring Exclusions (difficult to classify - see below)
 
-### 14. `test_multiline_string_literal_not_docstring`
+### 15. `test_multiline_string_literals_count_as_executable_code`
 
 **Covers:** Multi-line string literal assigned to variable (not a docstring)
 **Classification:** Docstring Exclusions (difficult to classify - see below)
 
-### 15. `test_syntax_error_handles_gracefully`
+### 16. `test_syntax_error_handles_gracefully_unclosed_paren`
 
-**Covers:** Error handling - malformed Python doesn't crash
+**Covers:** Error handling - malformed Python (unclosed parenthesis) doesn't crash
 **Classification:** Edge Cases & Error Handling
 
-### 16. `test_content_without_trailing_newline`
+### 17. `test_syntax_error_handles_gracefully_missing_colon`
+
+**Covers:** Error handling - malformed Python (missing colon) doesn't crash
+**Classification:** Edge Cases & Error Handling
+
+### 18. `test_content_without_trailing_newline`
 
 **Covers:** Edge case - content normalization (missing final newline)
 **Classification:** Edge Cases & Error Handling
 
-### 17. `test_classify_lines_comprehensive`
+### 19. `test_classify_lines_comprehensive`
 
 **Covers:** Integration test - realistic Python file with all classification types
 **Classification:** Integration Tests
@@ -101,12 +111,12 @@
 
 Tests the AST-based docstring detection for all supported node types:
 
-- `test_module_docstring_single_line`
-- `test_module_docstring_multiline`
-- `test_function_docstring`
-- `test_async_function_docstring`
-- `test_class_docstring`
-- `test_nested_function_docstring`
+- `test_single_line_module_docstring_counts_as_docstring`
+- `test_multiline_module_docstring_counts_as_docstring`
+- `test_function_docstring_counts_as_docstring`
+- `test_async_function_docstring_counts_as_docstring`
+- `test_class_docstring_counts_as_docstring`
+- `test_nested_function_docstrings_count_as_docstrings`
 
 **Coverage:** Module, FunctionDef, AsyncFunctionDef, ClassDef docstrings (maps to `_extract_docstring_lines`)
 
@@ -114,8 +124,8 @@ Tests the AST-based docstring detection for all supported node types:
 
 Tests what doesn't qualify as a docstring:
 
-- `test_string_literal_not_docstring`
-- `test_multiline_string_literal_not_docstring`
+- `test_string_literals_count_as_executable_code`
+- `test_multiline_string_literals_count_as_executable_code`
 
 **Coverage:** String literals that aren't first statement in module/function/class
 
@@ -123,37 +133,39 @@ Tests what doesn't qualify as a docstring:
 
 Tests comment detection and priority:
 
-- `test_standalone_comment`
-- `test_inline_comment_counts_as_code`
+- `test_standalone_comments_count_as_comments`
+- `test_inline_comment_counts_as_executable_code`
 
 **Coverage:** Standalone vs inline comments (maps to `_mark_comment_lines` and priority rules)
 
-### Group 4: Code Classification (2 tests)
+### Group 4: Executable Code Classification (2 tests)
 
-Tests basic code detection:
+Tests basic executable code detection:
 
-- `test_decorator_counts_as_code`
-- `test_simple_code_statement`
+- `test_decorator_counts_as_executable_code`
+- `test_executable_code_statements`
 
-**Coverage:** Decorator syntax and basic code lines (maps to `_mark_code_lines`)
+**Coverage:** Decorator syntax and basic executable code lines (maps to `_mark_executable_lines`)
 
-### Group 5: Blank Line Handling (1 test)
+### Group 5: Blank Line Handling (2 tests)
 
 Tests blank line behavior:
 
 - `test_single_blank_line`
+- `test_blank_lines_between_executable_code_not_counted`
 
 **Coverage:** Lines that remain "pending" become "blank"
 
-### Group 6: Edge Cases & Error Handling (3 tests)
+### Group 6: Edge Cases & Error Handling (4 tests)
 
 Tests robustness:
 
 - `test_empty_content`
-- `test_syntax_error_handles_gracefully`
+- `test_syntax_error_handles_gracefully_unclosed_paren`
+- `test_syntax_error_handles_gracefully_missing_colon`
 - `test_content_without_trailing_newline`
 
-**Coverage:** Empty input, malformed Python, missing newline
+**Coverage:** Empty input, malformed Python (multiple variants), missing newline
 
 ### Group 7: Integration (1 test)
 
@@ -167,16 +179,16 @@ Tests complete flow:
 
 ## Difficult-to-Classify Tests (and decisions made)
 
-### 1. `test_inline_comment_counts_as_code`
+### 1. `test_inline_comment_counts_as_executable_code`
 
-**Conflict:** Is this testing comments or code?
-**Decision:** Placed in "Comment Classification" because it tests comment behavior, specifically the classification priority rule (code tokens take precedence over comment tokens on the same line).
+**Conflict:** Is this testing comments or executable code?
+**Decision:** Placed in "Comment Classification" because it tests comment behavior, specifically the classification priority rule (executable code tokens take precedence over comment tokens on the same line).
 **Rationale:** Understanding comment behavior requires knowing this distinction.
 
-### 2. `test_string_literal_not_docstring` + `test_multiline_string_literal_not_docstring`
+### 2. `test_string_literals_count_as_executable_code` + `test_multiline_string_literals_count_as_executable_code`
 
-**Conflict:** Are these testing docstrings or code?
-**Decision:** Created separate "Docstring Exclusions" group rather than merging into "Docstring Classification" or "Code Classification".
+**Conflict:** Are these testing docstrings or executable code?
+**Decision:** Created separate "Docstring Exclusions" group rather than merging into "Docstring Classification" or "Executable Code Classification".
 **Rationale:** These tests verify the boundaries of what qualifies as a docstring (negative cases), which is conceptually different from testing that docstrings are detected (positive cases).
 
 ### 3. `test_empty_content`
@@ -193,7 +205,7 @@ Tests complete flow:
 
 **Rationale:**
 
-1. **Current pain:** User cannot navigate 17 tests effectively
+1. **Current pain:** User cannot navigate 19 tests effectively
 2. **Growth expected:** Test suite will expand as edge cases emerge
 3. **Clear structure:** Groups map directly to implementation flow
 4. **Low overhead:** Test classes add minimal syntax (no `self` needed)
@@ -204,14 +216,14 @@ Tests complete flow:
 ```python
 # === Docstring Classification ===
 
-def test_module_docstring_single_line():
+def test_single_line_module_docstring_counts_as_docstring():
     ...
 ```
 
 **Pros:** Simpler, less code
 **Cons:** Weaker separation, harder to navigate, no pytest benefits (shared fixtures, class-level setup)
 
-**Verdict:** Too weak for 17+ tests spanning 7 logical groups
+**Verdict:** Too weak for 19 tests spanning 7 logical groups
 
 ---
 
@@ -226,46 +238,48 @@ from plot_py_repo.count_lines import classify_lines
 class TestDocstringClassification:
     """Tests for AST-based docstring detection."""
 
-    def test_module_docstring_single_line(self) -> None: ...
-    def test_module_docstring_multiline(self) -> None: ...
-    def test_function_docstring(self) -> None: ...
-    def test_async_function_docstring(self) -> None: ...
-    def test_class_docstring(self) -> None: ...
-    def test_nested_function_docstring(self) -> None: ...
+    def test_single_line_module_docstring_counts_as_docstring(self) -> None: ...
+    def test_multiline_module_docstring_counts_as_docstring(self) -> None: ...
+    def test_function_docstring_counts_as_docstring(self) -> None: ...
+    def test_async_function_docstring_counts_as_docstring(self) -> None: ...
+    def test_class_docstring_counts_as_docstring(self) -> None: ...
+    def test_nested_function_docstrings_count_as_docstrings(self) -> None: ...
 
 
 class TestDocstringExclusions:
     """Tests for what doesn't qualify as a docstring."""
 
-    def test_string_literal_not_docstring(self) -> None: ...
-    def test_multiline_string_literal_not_docstring(self) -> None: ...
+    def test_string_literals_count_as_executable_code(self) -> None: ...
+    def test_multiline_string_literals_count_as_executable_code(self) -> None: ...
 
 
 class TestCommentClassification:
     """Tests for comment detection and priority rules."""
 
-    def test_standalone_comment(self) -> None: ...
-    def test_inline_comment_counts_as_code(self) -> None: ...
+    def test_standalone_comments_count_as_comments(self) -> None: ...
+    def test_inline_comment_counts_as_executable_code(self) -> None: ...
 
 
-class TestCodeClassification:
-    """Tests for basic code detection."""
+class TestExecutableCodeClassification:
+    """Tests for basic executable code detection."""
 
-    def test_decorator_counts_as_code(self) -> None: ...
-    def test_simple_code_statement(self) -> None: ...
+    def test_decorator_counts_as_executable_code(self) -> None: ...
+    def test_executable_code_statements(self) -> None: ...
 
 
 class TestBlankLineHandling:
     """Tests for blank line behavior."""
 
     def test_single_blank_line(self) -> None: ...
+    def test_blank_lines_between_executable_code_not_counted(self) -> None: ...
 
 
 class TestEdgeCasesAndErrorHandling:
     """Tests for robustness and boundary conditions."""
 
     def test_empty_content(self) -> None: ...
-    def test_syntax_error_handles_gracefully(self) -> None: ...
+    def test_syntax_error_handles_gracefully_unclosed_paren(self) -> None: ...
+    def test_syntax_error_handles_gracefully_missing_colon(self) -> None: ...
     def test_content_without_trailing_newline(self) -> None: ...
 
 
@@ -292,7 +306,8 @@ class TestIntegration:
 
 While analyzing tests, identified potential missing coverage:
 
-- **Multiple blank lines:** Single blank tested, but not consecutive blanks
+- **Gap now filled:** Multiple blank lines tested via `test_blank_lines_between_executable_code_not_counted`
+- **Gap now filled:** Multiple syntax error variants tested (unclosed paren, missing colon)
 - **Mixed scenarios:** Only one integration test for comprehensive scenarios
 
-**Recommendation:** Add remaining tests to appropriate classes after reorganization.
+**Recommendation:** Add more integration tests to appropriate class after reorganization.
