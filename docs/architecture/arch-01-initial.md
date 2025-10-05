@@ -1,6 +1,6 @@
 # ARCHITECTURE 1 (INITIAL COMMIT)
 
-```
+```text
 cli.py (MULTI-COMMAND INTERFACE)
   │
   ├─ count-lines <file>
@@ -56,22 +56,27 @@ plot_modules.py (STUB)
 ## KEY CHARACTERISTICS
 
 **Multi-Command CLI:**
+
 - Four separate subcommands: count-lines, generate-csv, plot-evolution, plot-modules
 - User manually chains commands together
 - Workflow: `generate-csv` → `plot-evolution` → `plot-modules` (3 separate invocations)
 
 **Separate Chart Modules (Planned):**
+
 - `plot_evolution.py` and `plot_modules.py` existed as separate files
 - Both were stubs with NotImplementedError
 - Shows intent for modular chart design (similar to a3.md future)
 
 **Utility Command:**
+
 - `count-lines` subcommand for analyzing individual files
 - Exposed `classify_lines()` functionality directly to users
 
 **CSV Generation:**
+
 - Same implementation as current (a2.md)
 - CSV columns: datetime, commit_id, dir_group, filename, category, line_count
 
 **Package Name:**
+
 - Original name: `viz-python-repo` (later renamed to `plot-py-repo`)

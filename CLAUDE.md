@@ -18,11 +18,13 @@ This file provides guidance to Claude Code when working with code in this reposi
 ## Core Architecture
 
 **Data Flow:**
+
 - CLI → `git_history.generate_csv()` (traverse commits → calls count_lines → writes CSV)
 - CLI → `visualise.create_charts()` (loads CSV, filters data, delegates to chart modules)
   - Calls `chart_*.create()` modules following consistent pattern
 
 **Key Modules:**
+
 - `cli.py`: CLI entry point (simple single-command interface)
 - `git_history.py`: Traverses Git commits, extracts files, calls count_lines, writes CSV
 - `count_lines.py`: Pure utility: classifies Python source lines (no I/O)
@@ -33,11 +35,13 @@ This file provides guidance to Claude Code when working with code in this reposi
 ## Commands
 
 **UV Workflow Rules:**
+
 - Use `uv run` - never activate venv
 - Use `uv add` - never pip
 - Use `pyproject.toml` - never requirements.txt
 
 ### Package Management
+
 ```bash
 uv sync                             # Match packages to lockfile
 uv add <pkg>                        # Add runtime dependency
@@ -48,6 +52,7 @@ uv lock --upgrade && uv sync        # Update all packages and apply
 ```
 
 ### Application CLI
+
 ```bash
 uv run plot-py-repo                  # Visualise cwd repo (creates CSV + charts)
 uv run plot-py-repo /path/to/repo             # Visualise different repo
@@ -58,6 +63,7 @@ uv run plot-py-repo --output-dir ./reports    # Save all outputs to ./reports
 **Note**: `repo_path` and `--csv` are mutually exclusive (cannot use both together)
 
 ### Development Tools
+
 ```bash
 uv run pytest                                   # Run all tests
 uv run pytest -v <test_file>::<test_function>   # Run specific test
@@ -70,11 +76,13 @@ uv run pre-commit run --all-files               # Run all pre-commit hooks
 ## Code Design Principles: Elegant Simplicity over Over-Engineered (YAGNI)
 
 **TDD-Driven Design**: Write tests first - this naturally creates better architecture:
+
 - **Pure functions preferred**: no side effects in business logic, easier to test
 - **Clear module boundaries**: easier to test and understand
 - **Single responsibility**: complex functions are hard to test
 
 **Key Architecture Guidelines**:
+
 - **Layer separation**: CLI → business logic → I/O
 - **One module, one purpose**: Each `.py` file has a clear, focused role
 - **Handle errors at boundaries**: Catch exceptions in CLI layer, not business logic
