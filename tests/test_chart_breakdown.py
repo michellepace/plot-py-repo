@@ -13,7 +13,8 @@ def test_prepare_data_requires_essential_columns() -> None:
     """_prepare_data() requires essential columns from CSV."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"],
+            "repo_name": ["test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00"]),
             "filedir": ["src"],
             "filename": ["module.py"],
             "total_lines": [115],
@@ -31,7 +32,8 @@ def test_prepare_data_fails_with_missing_required_columns() -> None:
     """_prepare_data() raises KeyError when essential columns are missing."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"],
+            "repo_name": ["test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00"]),
             "filedir": ["src"],
             # Missing filename and total_lines
         }
@@ -46,12 +48,15 @@ def test_prepare_data_filters_to_latest_commit_only() -> None:
     """With multiple commits, only the latest commit's data is used."""
     df = pd.DataFrame(
         {
-            "commit_date": [
-                "2024-01-01T10:00:00",  # Earlier commit
-                "2024-01-01T10:00:00",
-                "2024-01-02T15:00:00",  # Latest commit (should be used)
-                "2024-01-02T15:00:00",
-            ],
+            "repo_name": ["test-repo"] * 4,
+            "commit_date": pd.to_datetime(
+                [
+                    "2024-01-01T10:00:00",  # Earlier commit
+                    "2024-01-01T10:00:00",
+                    "2024-01-02T15:00:00",  # Latest commit (should be used)
+                    "2024-01-02T15:00:00",
+                ]
+            ),
             "filedir": ["src", "tests", "src", "tests"],
             "filename": ["main.py", "test_main.py", "main.py", "test_main.py"],
             "total_lines": [115, 230, 173, 287],
@@ -71,7 +76,8 @@ def test_prepare_data_sorts_by_line_count_descending() -> None:
     """Files sorted by line count descending (largest first for horizontal bar chart)."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"] * 3,
+            "repo_name": ["test-repo"] * 3,
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00"] * 3),
             "filedir": ["src", "src", "tests"],
             "filename": ["small.py", "large.py", "medium.py"],
             "total_lines": [58, 350, 175],
@@ -96,7 +102,8 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
     """create() writes WebP file to specified path."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00", "2024-01-02T10:00:00"],
+            "repo_name": ["test-repo", "test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00", "2024-01-02T10:00:00"]),
             "filedir": ["src", "tests"],
             "filename": ["module.py", "test_module.py"],
             "total_lines": [115, 58],

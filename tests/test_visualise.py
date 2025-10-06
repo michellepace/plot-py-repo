@@ -8,15 +8,25 @@ from plot_py_repo.visualise import _exclude_filenames, _load_csv
 
 
 def test_load_csv_loads_dataframe(tmp_path: Path) -> None:
-    """Loads CSV file and returns DataFrame."""
+    """Loads CSV file and returns DataFrame with correct types."""
     csv_path = tmp_path / "test_history.csv"
-    df = pd.DataFrame({"col1": [1, 2], "col2": [3, 4]})
+    df = pd.DataFrame(
+        {
+            "repo_name": ["test-repo", "test-repo"],
+            "commit_date": ["2025-10-06 12:00:00 +0200", "2025-10-07 12:00:00 +0200"],
+            "code_lines": [10, 20],
+            "total_lines": [15, 25],
+        }
+    )
     df.to_csv(csv_path, index=False)
 
     result = _load_csv(str(csv_path))
 
     assert isinstance(result, pd.DataFrame)
     assert len(result) == 2
+    assert pd.api.types.is_datetime64_any_dtype(result["commit_date"])
+    assert result["code_lines"].dtype == "int64"
+    assert result["total_lines"].dtype == "int64"
 
 
 def test_exclude_filenames_single() -> None:

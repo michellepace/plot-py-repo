@@ -1,11 +1,12 @@
 """Breakdown chart generation for Python repository evolution."""
 
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 import plotly.express as px
 
-from .theme import apply_common_layout
+from .theme import add_footnote_annotation, apply_common_layout
 
 CHART_TITLE = "Repository Breakdown by File"
 
@@ -18,7 +19,9 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
         output_path: Path where WebP image should be saved
     """
     df_prepared = _prepare_data(df)
-    _plot_and_save(df_prepared, output_path)
+    latest_commit_date = cast("pd.Timestamp", df["commit_date"].max())
+    repo_name = df["repo_name"].iloc[0]
+    _plot_and_save(df_prepared, latest_commit_date, output_path, repo_name)
 
 
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -26,12 +29,17 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     latest_commit_date = df["commit_date"].max()
     return (
         df[df["commit_date"] == latest_commit_date]
-        .loc[:, ["filedir", "filename", "total_lines"]]
+        .loc[:, ["repo_name", "filedir", "filename", "total_lines", "commit_date"]]
         .sort_values("total_lines", ascending=False)
     )
 
 
-def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
+def _plot_and_save(
+    df_prepared: pd.DataFrame,
+    latest_commit_date: pd.Timestamp,
+    output_path: Path,
+    repo_name: str,
+) -> None:
     """Generate horizontal bar chart and write WebP image to output_path."""
     fig = px.bar(
         df_prepared,
@@ -46,4 +54,7 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
     )
 
     apply_common_layout(fig)
+    add_footnote_annotation(
+        fig, repository_name=repo_name, latest_commit_date=latest_commit_date
+    )
     fig.write_image(str(output_path), scale=2)
