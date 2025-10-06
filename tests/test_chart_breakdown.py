@@ -1,4 +1,4 @@
-"""Tests for chart_breakdown module."""
+"""Tests for horizontal bar chart: data filtering, sorting, and image export."""
 
 from pathlib import Path
 
@@ -22,7 +22,6 @@ def test_prepare_data_requires_essential_columns() -> None:
 
     result = _prepare_data(df)
 
-    # Should succeed and produce expected output columns
     assert "filedir" in result.columns
     assert "filename" in result.columns
     assert "total_lines" in result.columns

@@ -7,6 +7,8 @@ import plotly.express as px
 
 from .theme import apply_common_layout
 
+CHART_TITLE = "Repository Breakdown by File"
+
 
 def create(df: pd.DataFrame, output_path: Path) -> None:
     """Create horizontal bar chart showing repository breakdown by file.
@@ -20,10 +22,7 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 
 
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Transform commit data into file-level line counts for latest commit.
-
-    Returns DataFrame with columns: filedir, filename, total_lines (sorted descending).
-    """
+    """Extract latest commit data and return file-level line counts sorted descending."""
     latest_commit_date = df["commit_date"].max()
     return (
         df[df["commit_date"] == latest_commit_date]
@@ -39,7 +38,7 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         y="filename",
         x="total_lines",
         color="filedir",
-        title="Repository Breakdown by File (current state)",
+        title=CHART_TITLE,
         labels={"filename": "", "total_lines": "Total Lines"},
         text="total_lines",
         orientation="h",

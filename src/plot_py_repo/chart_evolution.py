@@ -1,4 +1,4 @@
-"""Evolution chart generation for Python repository evolution."""
+"""Stacked area chart visualising repository growth over time."""
 
 from pathlib import Path
 from typing import cast
@@ -8,6 +8,12 @@ import pandas as pd
 import plotly.express as px
 
 from .theme import apply_common_layout
+
+CHART_TITLE = "Repository Growth Over Time"
+
+CATEGORY_CODE_COMMENTS = "Code Comments"
+CATEGORY_SOURCE_CODE = "Source Code"
+CATEGORY_TEST_CODE = "Test Code"
 
 
 def create(df: pd.DataFrame, output_path: Path) -> None:
@@ -21,22 +27,25 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
     _plot_and_save(df_prepared, output_path)
 
 
-def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Transform granular commit data into aggregated chart categories by date.
+def _prepare_data(df_per_file: pd.DataFrame) -> pd.DataFrame:
+    """Transform per-file commit data into aggregated chart categories by date.
+
+    Input: One row per file per commit (includes filedir column).
 
     Process:
-    1. Extracts dates from commit_date, filters to latest commit per date
-    2. Melts wide format (code_lines, documentation_lines columns) to long format
-    3. Categorizes each row based on line_type and filedir:
-       - documentation_lines (any dir) → "Documentation"
+    1. Extract dates, filter to latest commit per date (one version per file/date)
+    2. Melt wide format (code_lines, documentation_lines) to long format
+    3. Categorise by line_type and filedir:
+       - documentation_lines → "Code Comments"
        - code_lines + src → "Source Code"
        - code_lines + tests → "Test Code"
-       - code_lines + other → "Other"
+       - code_lines + other → "UNCATEGORISED_DIR"
+    4. Sum lines across all files within each date/category combination
 
     Returns:
         DataFrame with columns: date, category, line_count (one row per date/category)
     """
-    df = df.copy()
+    df = df_per_file.copy()
     df["timestamp"] = pd.to_datetime(df["commit_date"])
     df["date"] = df["timestamp"].dt.date
 
@@ -44,7 +53,7 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     latest_per_date = df.groupby("date")["timestamp"].max().reset_index()
     df = df.merge(latest_per_date, on=["date", "timestamp"], how="inner")
 
-    # Transform wide format to long format using melt
+    # Transform wide format to long format
     df_long = df.melt(
         id_vars=["date", "filedir"],
         value_vars=["code_lines", "documentation_lines"],
@@ -52,14 +61,14 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
         value_name="line_count",
     )
 
-    # Map line type and directory to display categories (vectorized)
+    # Map line_type and filedir to display categories
     conditions = [
         df_long["line_type"] == "documentation_lines",
         (df_long["line_type"] == "code_lines") & (df_long["filedir"] == "src"),
         (df_long["line_type"] == "code_lines") & (df_long["filedir"] == "tests"),
     ]
-    choices = ["Documentation", "Source Code", "Test Code"]
-    df_long["category"] = np.select(conditions, choices, default="Other")
+    choices = [CATEGORY_CODE_COMMENTS, CATEGORY_SOURCE_CODE, CATEGORY_TEST_CODE]
+    df_long["category"] = np.select(conditions, choices, default="UNCATEGORISED_DIR")
 
     # Aggregate by date and category
     result = df_long.groupby(["date", "category"], as_index=False)["line_count"].sum()
@@ -87,7 +96,7 @@ def _plot_and_save(df_prepared: pd.DataFrame, output_path: Path) -> None:
         x="date",
         y="line_count",
         color="category",
-        title="Repository Growth Over Time",
+        title=CHART_TITLE,
         labels={"date": "", "line_count": "Total Lines"},
         category_orders={"category": category_order},
     )

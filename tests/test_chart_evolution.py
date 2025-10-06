@@ -1,11 +1,18 @@
-"""Tests for chart_evolution module."""
+"""Tests for stacked area chart: data transformation, categorisation, and image export."""
 
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from plot_py_repo.chart_evolution import _calculate_category_order, _prepare_data, create
+from plot_py_repo.chart_evolution import (
+    CATEGORY_CODE_COMMENTS,
+    CATEGORY_SOURCE_CODE,
+    CATEGORY_TEST_CODE,
+    _calculate_category_order,
+    _prepare_data,
+    create,
+)
 
 
 # Chapter 1: Data Contract
@@ -61,30 +68,57 @@ def test_prepare_data_filters_to_latest_commit_per_date() -> None:
 
     assert len(result) == 3
     categories = result["category"].tolist()
-    assert "Source Code" in categories
-    assert "Test Code" in categories
-    assert "Documentation" in categories
+    assert CATEGORY_SOURCE_CODE in categories
+    assert CATEGORY_TEST_CODE in categories
+    assert CATEGORY_CODE_COMMENTS in categories
 
 
 def test_prepare_data_categorises_files_by_directory() -> None:
-    """Files categorized by directory: src→Source Code, tests→Test Code, other→Other."""
+    """Files categorised by directory: src→Source Code, tests→Test Code."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"] * 4,
-            "filedir": ["src", "tests", "docs", "lib"],
-            "code_lines": [100, 200, 50, 75],
-            "documentation_lines": [15, 30, 8, 12],
+            "commit_date": ["2024-01-01T10:00:00"] * 2,
+            "filedir": ["src", "tests"],
+            "code_lines": [100, 200],
+            "documentation_lines": [15, 30],
         }
     )
 
     result = _prepare_data(df)
 
     categories = result["category"].tolist()
-    assert "Source Code" in categories
-    assert "Test Code" in categories
-    assert "Other" in categories
-    assert "Documentation" in categories
-    assert len(result) == 4
+    assert CATEGORY_SOURCE_CODE in categories
+    assert CATEGORY_TEST_CODE in categories
+    assert CATEGORY_CODE_COMMENTS in categories
+
+
+def test_prepare_data_uses_fail_loud_for_uncategorised_directories() -> None:
+    """Non-src/non-tests directories produce UNCATEGORISED_DIR (fail-loud).
+
+    Note: Currently impossible in production as git_history only scans src/ and tests/.
+    This test documents defensive behaviour if filters change.
+    """
+    df = pd.DataFrame(
+        {
+            "commit_date": ["2024-01-01T10:00:00"] * 2,
+            "filedir": ["docs", "scripts"],
+            "code_lines": [50, 75],
+            "documentation_lines": [8, 12],
+        }
+    )
+
+    result = _prepare_data(df)
+
+    # All code_lines entries should be categorised as UNCATEGORISED_DIR
+    # Note: After groupby, docs+scripts get aggregated into single row
+    uncategorised_rows = result[result["category"] == "UNCATEGORISED_DIR"]
+    assert len(uncategorised_rows) == 1
+    assert uncategorised_rows["line_count"].item() == 125  # 50 + 75
+
+    # Documentation lines still get categorised as Code Comments
+    comment_rows = result[result["category"] == CATEGORY_CODE_COMMENTS]
+    assert len(comment_rows) == 1
+    assert comment_rows["line_count"].item() == 20  # 8 + 12
 
 
 def test_prepare_data_aggregates_lines_by_category() -> None:
@@ -100,8 +134,8 @@ def test_prepare_data_aggregates_lines_by_category() -> None:
 
     result = _prepare_data(df)
 
-    assert result[result["category"] == "Source Code"]["line_count"].item() == 150
-    assert result[result["category"] == "Documentation"]["line_count"].item() == 20
+    assert result[result["category"] == CATEGORY_SOURCE_CODE]["line_count"].item() == 150
+    assert result[result["category"] == CATEGORY_CODE_COMMENTS]["line_count"].item() == 20
 
 
 # Chapter 3: Helper Functions
