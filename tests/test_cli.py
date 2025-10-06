@@ -87,12 +87,12 @@ def test_git_analysis_creates_csv_and_images_in_output_dir(tmp_path: Path) -> No
 @pytest.mark.slow
 def test_csv_flag_generates_images_from_existing_csv(tmp_path: Path) -> None:
     """Skips Git traversal, reads provided CSV, generates charts only."""
-    # Create a sample CSV file
+    # Create a sample CSV file with wide format
     csv_file = tmp_path / "sample.csv"
     csv_file.write_text(
-        "commit_date,commit_id,filedir,filename,category,line_count\n"
-        "2025-01-01T00:00:00+00:00,abc123,src,example.py,executable,10\n"
-        "2025-01-01T00:00:00+00:00,abc123,src,example.py,documentation,5\n"
+        "commit_date,commit_id,filedir,filename,code_lines,docstring_lines,"
+        "comment_lines,total_lines,documentation_lines\n"
+        "2025-01-01T00:00:00+00:00,abc123,src,example.py,10,3,2,15,5\n"
     )
 
     output_dir = tmp_path / "output"

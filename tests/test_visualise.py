@@ -21,20 +21,7 @@ def test_load_csv_loads_dataframe(tmp_path: Path) -> None:
 
 def test_exclude_filenames_single() -> None:
     """Removes rows matching single filename."""
-    df = pd.DataFrame(
-        {
-            "commit_date": [
-                "2024-01-01T10:00:00",
-                "2024-01-01T10:00:00",
-                "2024-01-01T10:00:00",
-            ],
-            "commit_id": ["abc123", "abc123", "abc123"],
-            "filedir": ["src", "src", "tests"],
-            "filename": ["module.py", "__init__.py", "test_example.py"],
-            "category": ["executable", "executable", "executable"],
-            "line_count": [100, 1, 50],
-        }
-    )
+    df = pd.DataFrame({"filename": ["module.py", "__init__.py", "test_example.py"]})
 
     result = _exclude_filenames(df, ["__init__.py"])
 
@@ -47,16 +34,7 @@ def test_exclude_filenames_single() -> None:
 
 def test_exclude_filenames_multiple() -> None:
     """Removes rows matching multiple filenames."""
-    df = pd.DataFrame(
-        {
-            "commit_date": ["2024-01-01T10:00:00"] * 4,
-            "commit_id": ["abc123"] * 4,
-            "filedir": ["src"] * 4,
-            "filename": ["module.py", "__init__.py", "horse.py", "main.py"],
-            "category": ["executable"] * 4,
-            "line_count": [100, 1, 50, 75],
-        }
-    )
+    df = pd.DataFrame({"filename": ["module.py", "__init__.py", "horse.py", "main.py"]})
 
     result = _exclude_filenames(df, ["__init__.py", "horse.py"])
 
@@ -70,16 +48,7 @@ def test_exclude_filenames_multiple() -> None:
 
 def test_exclude_filenames_empty_list_returns_all_rows() -> None:
     """Empty exclusion list returns all rows unchanged."""
-    df = pd.DataFrame(
-        {
-            "commit_date": ["2024-01-01T10:00:00"] * 2,
-            "commit_id": ["abc123"] * 2,
-            "filedir": ["src"] * 2,
-            "filename": ["module.py", "__init__.py"],
-            "category": ["executable"] * 2,
-            "line_count": [100, 1],
-        }
-    )
+    df = pd.DataFrame({"filename": ["module.py", "__init__.py"]})
 
     result = _exclude_filenames(df, [])
 
@@ -89,16 +58,7 @@ def test_exclude_filenames_empty_list_returns_all_rows() -> None:
 
 def test_exclude_filenames_nonexistent_filename_returns_all_rows() -> None:
     """Non-existent filename in exclusion list returns all rows."""
-    df = pd.DataFrame(
-        {
-            "commit_date": ["2024-01-01T10:00:00"] * 2,
-            "commit_id": ["abc123"] * 2,
-            "filedir": ["src"] * 2,
-            "filename": ["module.py", "main.py"],
-            "category": ["executable"] * 2,
-            "line_count": [100, 50],
-        }
-    )
+    df = pd.DataFrame({"filename": ["module.py", "main.py"]})
 
     result = _exclude_filenames(df, ["nonexistent.py"])
 

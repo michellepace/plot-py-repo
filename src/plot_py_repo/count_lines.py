@@ -41,15 +41,17 @@ def _extract_docstring_lines(content: str) -> set[int]:
 
 
 def _tokenize_content(content: str) -> list[tokenize.TokenInfo]:
-    """Tokenize Python content, returning empty list on error."""
+    """Tokenise Python content, returning empty list on error."""
     tokens: list[tokenize.TokenInfo] = []
     with contextlib.suppress(tokenize.TokenError):
         tokens = list(tokenize.generate_tokens(StringIO(content).readline))
     return tokens
 
 
-def _mark_executable_lines(tokens: list[tokenize.TokenInfo], classif: list[str]) -> None:
-    """Mark lines as 'executable' based on non-structural, non-comment tokens."""
+def _mark_code_lines(
+    tokens: list[tokenize.TokenInfo], line_classifications: list[str]
+) -> None:
+    """Mark lines as 'code' based on non-structural, non-comment tokens."""
     structural = {
         tokenize.INDENT,
         tokenize.DEDENT,
@@ -64,29 +66,43 @@ def _mark_executable_lines(tokens: list[tokenize.TokenInfo], classif: list[str])
         start_row, _ = start
         end_row, _ = end
         for row in range(start_row, end_row + 1):
-            if 0 < row <= len(classif) and classif[row - 1] == "pending":
-                classif[row - 1] = "executable"
+            if (
+                0 < row <= len(line_classifications)
+                and line_classifications[row - 1] == "pending"
+            ):
+                line_classifications[row - 1] = "code"
 
 
-def _mark_comment_lines(tokens: list[tokenize.TokenInfo], classif: list[str]) -> None:
+def _mark_comment_lines(
+    tokens: list[tokenize.TokenInfo], line_classifications: list[str]
+) -> None:
     """Mark lines as 'comment' based on comment tokens."""
     for tok in tokens:
         toktype, _, start, _, _ = tok
         if toktype == tokenize.COMMENT:
             start_row, _ = start
-            if 0 < start_row <= len(classif) and classif[start_row - 1] == "pending":
-                classif[start_row - 1] = "comment"
+            if (
+                0 < start_row <= len(line_classifications)
+                and line_classifications[start_row - 1] == "pending"
+            ):
+                line_classifications[start_row - 1] = "comment"
 
 
 def classify_lines(content: str) -> tuple[int, int, int]:
-    """Classify lines in Python content as docstrings, comments, or executable.
+    """Count lines in Python content, classifying each as docstring, comment, or code.
+
+    Blank lines are counted as code.
 
     Args:
         content: Python source code as string
 
     Returns:
-        Tuple of (docstring_lines, comment_lines, executable_lines) counts
+        Tuple of (docstring_lines, comment_lines, code_lines) total counts
     """
+    # Handle truly empty content (0 bytes)
+    if not content:
+        return (0, 0, 0)
+
     if not content.endswith("\n"):
         content += "\n"
 
@@ -96,34 +112,34 @@ def classify_lines(content: str) -> tuple[int, int, int]:
     # Collect docstring lines using AST
     docstring_lines = _extract_docstring_lines(content)
 
-    # Tokenize the content
+    # Tokenise the content
     tokens = _tokenize_content(content)
 
-    # Initialize classification list (0-based index)
-    classif = ["pending"] * total_lines
+    # Initialise classification list (0-based index)
+    line_classifications = ["pending"] * total_lines
 
     # Set docstring classifications
     for line_num in docstring_lines:
-        classif[line_num - 1] = "docstring"
+        line_classifications[line_num - 1] = "docstring"
 
-    # Mark executable and comment lines
+    # Mark code and comment lines
     if tokens:
-        _mark_executable_lines(tokens, classif)
-        _mark_comment_lines(tokens, classif)
+        _mark_code_lines(tokens, line_classifications)
+        _mark_comment_lines(tokens, line_classifications)
     else:
-        # Fallback: when tokenization fails, mark non-blank lines as executable
+        # Fallback: when tokenisation fails, mark non-blank lines as code
         for i, line in enumerate(lines):
-            if line.strip() and classif[i] == "pending":
-                classif[i] = "executable"
+            if line.strip() and line_classifications[i] == "pending":
+                line_classifications[i] = "code"
 
     # Remaining 'pending' are blanks
     for i in range(total_lines):
-        if classif[i] == "pending":
-            classif[i] = "blank"
+        if line_classifications[i] == "pending":
+            line_classifications[i] = "blank"
 
-    # Count the categories
+    # Count the categories (blanks are included in code count)
     return (
-        classif.count("docstring"),
-        classif.count("comment"),
-        classif.count("executable"),
+        line_classifications.count("docstring"),
+        line_classifications.count("comment"),
+        line_classifications.count("code") + line_classifications.count("blank"),
     )
