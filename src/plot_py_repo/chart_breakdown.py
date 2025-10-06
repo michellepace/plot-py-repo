@@ -29,7 +29,7 @@ def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     latest_commit_date = df["commit_date"].max()
     return (
         df[df["commit_date"] == latest_commit_date]
-        .loc[:, ["repo_name", "filedir", "filename", "total_lines", "commit_date"]]
+        .loc[:, ["filedir", "filename", "total_lines"]]
         .sort_values("total_lines", ascending=False)
     )
 
