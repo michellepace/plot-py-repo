@@ -9,7 +9,7 @@ This branch as an open PR which CodeRabbit AI has provided some comments. CodeRa
 
 ## Comment to Review
 
-```
+```text
 $ARGUMENTS
 ```
 
@@ -23,4 +23,4 @@ $ARGUMENTS
    - lightly consider CLI application may oneday be a API Service, does it detract?
 3. Make your recommendation and provide reasoning
 
-Include emoji's in your response for readability. 
+Include emoji's in your response for readability.

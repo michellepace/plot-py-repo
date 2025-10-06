@@ -72,6 +72,9 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
     display_path = repo_path if repo_path != "." else "current directory"
     print(f"➡️  Analyzing Git history at {display_path}...")
 
+    # Extract repository name
+    repo_name = Path(repo_path).resolve().name
+
     # Construct output file path
     output_file = Path(output_dir) / "repo_history.csv"
     file_exists = output_file.exists()
@@ -93,7 +96,7 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
 
     with output_file.open("w", encoding="utf-8") as f:
         f.write(
-            "commit_date,commit_id,filedir,filename,code_lines,docstring_lines,"
+            "repo_name,commit_date,commit_id,filedir,filename,code_lines,docstring_lines,"
             "comment_lines,total_lines,documentation_lines\n"
         )
         lines_written += 1
@@ -152,7 +155,7 @@ def generate_csv(repo_path: str, output_dir: str) -> str:
                 # Write single row with all columns
                 #  (timestamp format: "YYYY-MM-DD HH:MM:SS +ZZZZ")
                 f.write(
-                    f"{git_timestamp},{commit_hash},{filedir},{filename},"
+                    f"{repo_name},{git_timestamp},{commit_hash},{filedir},{filename},"
                     f"{code_lines},{docstring_lines},{comment_lines},"
                     f"{total_lines},{documentation_lines}\n"
                 )

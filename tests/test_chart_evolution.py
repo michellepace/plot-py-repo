@@ -20,7 +20,8 @@ def test_prepare_data_requires_essential_columns() -> None:
     """_prepare_data() requires essential columns from CSV."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"],
+            "repo_name": ["test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00"]),
             "filedir": ["src"],
             "code_lines": [100],
             "documentation_lines": [15],
@@ -38,7 +39,8 @@ def test_prepare_data_fails_with_missing_required_columns() -> None:
     """_prepare_data() raises KeyError when essential columns are missing."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"],
+            "repo_name": ["test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00"]),
             # Missing filedir and code_lines
         }
     )
@@ -52,12 +54,15 @@ def test_prepare_data_filters_to_latest_commit_per_date() -> None:
     """With multiple commits on same date, use only the latest commit state."""
     df = pd.DataFrame(
         {
-            "commit_date": [
-                "2024-01-01T10:00:00",  # Earlier commit
-                "2024-01-01T10:00:00",
-                "2024-01-01T15:00:00",  # Later commit (should be used)
-                "2024-01-01T15:00:00",
-            ],
+            "repo_name": ["test-repo"] * 4,
+            "commit_date": pd.to_datetime(
+                [
+                    "2024-01-01T10:00:00",  # Earlier commit
+                    "2024-01-01T10:00:00",
+                    "2024-01-01T15:00:00",  # Later commit (should be used)
+                    "2024-01-01T15:00:00",
+                ]
+            ),
             "filedir": ["src", "tests", "src", "tests"],
             "code_lines": [100, 200, 150, 250],
             "documentation_lines": [15, 30, 23, 37],
@@ -77,7 +82,8 @@ def test_prepare_data_categorises_files_by_directory() -> None:
     """Files categorised by directory: src→Source Code, tests→Test Code."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"] * 2,
+            "repo_name": ["test-repo", "test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00"] * 2),
             "filedir": ["src", "tests"],
             "code_lines": [100, 200],
             "documentation_lines": [15, 30],
@@ -100,7 +106,8 @@ def test_prepare_data_uses_fail_loud_for_uncategorised_directories() -> None:
     """
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"] * 2,
+            "repo_name": ["test-repo", "test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00"] * 2),
             "filedir": ["docs", "scripts"],
             "code_lines": [50, 75],
             "documentation_lines": [8, 12],
@@ -125,7 +132,8 @@ def test_prepare_data_aggregates_lines_by_category() -> None:
     """Line counts correctly aggregated across files within each category."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00"] * 2,
+            "repo_name": ["test-repo", "test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00"] * 2),
             "filedir": ["src", "src"],
             "code_lines": [100, 50],
             "documentation_lines": [13, 7],
@@ -161,7 +169,8 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
     """create() writes WebP file to specified path."""
     df = pd.DataFrame(
         {
-            "commit_date": ["2024-01-01T10:00:00", "2024-01-02T10:00:00"],
+            "repo_name": ["test-repo", "test-repo"],
+            "commit_date": pd.to_datetime(["2024-01-01T10:00:00", "2024-01-02T10:00:00"]),
             "filedir": ["src", "src"],
             "code_lines": [100, 150],
             "documentation_lines": [15, 23],

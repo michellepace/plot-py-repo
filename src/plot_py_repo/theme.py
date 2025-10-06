@@ -1,12 +1,20 @@
 """Centralised theming for Plotly visualisations."""
 
+import pandas as pd
 from plotly.graph_objects import Figure
 
 # Standard layout settings applied to all charts
 DEFAULT_LAYOUT = {
-    "template": "plotly_white",
+    "template": "plotly_white",  # plotly_dark, simple_white
     "width": 1600,
     "height": 900,
+    # Explicit margins for precise positioning
+    "margin": {
+        "l": 80,  # Left margin
+        "r": 40,  # Right margin
+        "t": 100,  # Top margin
+        "b": 80,  # Bottom margin (space for footer)
+    },
     # Legend positioned horizontally at top right, above chart area
     "legend": {
         "orientation": "h",
@@ -17,6 +25,11 @@ DEFAULT_LAYOUT = {
         "title_text": "",
     },
 }
+
+
+def _format_date(commit_datetime: pd.Timestamp) -> str:
+    """Format pandas Timestamp to human-readable date (e.g., '6 Oct 2025')."""
+    return commit_datetime.strftime("%d %b %Y").lstrip("0")
 
 
 def apply_common_layout(fig: Figure) -> Figure:
@@ -30,5 +43,41 @@ def apply_common_layout(fig: Figure) -> Figure:
     Returns:
         The same figure with layout settings applied (for method chaining)
     """
-    fig.update_layout(**DEFAULT_LAYOUT)
+    return fig.update_layout(**DEFAULT_LAYOUT)
+
+
+def add_footnote_annotation(
+    fig: Figure, repository_name: str, latest_commit_date: pd.Timestamp
+) -> Figure:
+    """Add footer annotation with repository context below chart area.
+
+    Positioning uses paper coordinates relative to plot area:
+    - (0, 0) = bottom-left corner of plot area
+    - (1, 1) = top-right corner of plot area
+    - x=-0.05: 5% left of plot area's left edge (aligns with y-axis)
+    - y=-0.17: 17% below plot area's bottom edge (in bottom margin)
+
+    Args:
+        fig: Plotly figure to add footer to
+        repository_name: Name of repository being visualised
+        latest_commit_date: Date of most recent commit in the chart
+
+    Returns:
+        The same figure with footer annotation added (for method chaining)
+    """
+    formatted_date = _format_date(latest_commit_date)
+    footer_text = f"{repository_name}, {formatted_date} • All lines counted (as in IDE)"
+
+    fig.add_annotation(
+        xref="paper",
+        yref="paper",
+        x=-0.05,
+        y=-0.17,
+        text=footer_text,
+        showarrow=False,
+        font={"size": 10, "color": "#5E5D59"},
+        xanchor="left",
+        yanchor="top",
+    )
+
     return fig
