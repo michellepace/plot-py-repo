@@ -1,4 +1,4 @@
-"""Stacked area chart visualising repository growth over time."""
+"""Stacked bar chart visualising repository growth by commit index."""
 
 from pathlib import Path
 from typing import cast
@@ -9,7 +9,7 @@ import plotly.express as px
 
 from .theme import add_footnote_annotation, apply_common_layout, save_chart_image
 
-CHART_TITLE = "Repository Growth Over Time"
+CHART_TITLE = "Repository Growth by Commit"
 
 CATEGORY_CODE_COMMENTS = "Code Comments"
 CATEGORY_SOURCE_CODE = "Source Code"
@@ -17,7 +17,7 @@ CATEGORY_TEST_CODE = "Test Code"
 
 
 def create(df: pd.DataFrame, output_path: Path) -> None:
-    """Create stacked area chart showing codebase evolution over time.
+    """Create stacked bar chart showing codebase evolution by commit index.
 
     Args:
         df: DataFrame with commit history data
@@ -30,33 +30,38 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 
 
 def _prepare_data(df_per_file: pd.DataFrame) -> pd.DataFrame:
-    """Transform per-file commit data into aggregated chart categories by date.
+    """Transform per-file commit data into aggregated chart categories by commit index.
 
     Input: One row per file per commit (includes filedir column).
 
     Process:
-    1. Extract dates, filter to latest commit per date (one version per file/date)
+    1. Create commit_index by ranking unique commits chronologically (oldest = 1)
+       Uses commit_id to ensure each unique commit gets its own index,
+       preventing duplicate timestamps from being aggregated together
     2. Melt wide format (code_lines, documentation_lines) to long format
     3. Categorise by line_type and filedir:
        - documentation_lines → "Code Comments"
        - code_lines + src → "Source Code"
        - code_lines + tests → "Test Code"
        - code_lines + other → "UNCATEGORISED_DIR"
-    4. Sum lines across all files within each date/category combination
+    4. Sum lines across all files within each commit_index/category combination
 
     Returns:
-        DataFrame with columns: date, category, line_count (one row per date/category)
+        DataFrame with columns: commit_index, category, line_count
+        (one row per commit_index/category)
     """
     df = df_per_file.copy()
-    df["date"] = df["commit_date"].dt.date
 
-    # Filter to latest commit per date
-    latest_per_date = df.groupby("date")["commit_date"].max().reset_index()
-    df = df.merge(latest_per_date, on=["date", "commit_date"], how="inner")
+    # Create commit index: rank commits chronologically (oldest = 1)
+    # Use commit_id to ensure each unique commit gets its own index
+    commit_info = df[["commit_date", "commit_id"]].drop_duplicates()
+    commit_info = commit_info.sort_values(["commit_date", "commit_id"])  # type: ignore[call-overload]
+    commit_info["commit_index"] = range(1, len(commit_info) + 1)
+    df = df.merge(commit_info, on=["commit_date", "commit_id"], how="left")
 
     # Transform wide format to long format
     df_long = df.melt(
-        id_vars=["date", "filedir"],
+        id_vars=["commit_index", "filedir"],
         value_vars=["code_lines", "documentation_lines"],
         var_name="line_type",
         value_name="line_count",
@@ -71,8 +76,10 @@ def _prepare_data(df_per_file: pd.DataFrame) -> pd.DataFrame:
     choices = [CATEGORY_CODE_COMMENTS, CATEGORY_SOURCE_CODE, CATEGORY_TEST_CODE]
     df_long["category"] = np.select(conditions, choices, default="UNCATEGORISED_DIR")
 
-    # Aggregate by date and category
-    result = df_long.groupby(["date", "category"], as_index=False)["line_count"].sum()
+    # Aggregate by commit_index and category
+    result = df_long.groupby(["commit_index", "category"], as_index=False)[
+        "line_count"
+    ].sum()
 
     return cast("pd.DataFrame", result)
 
@@ -94,17 +101,18 @@ def _plot_and_save(
     output_path: Path,
     repo_name: str,
 ) -> None:
-    """Generate stacked area chart and write WebP image to output_path."""
+    """Generate stacked bar chart and write WebP image to output_path."""
     category_order = _calculate_category_order(df_prepared)
 
-    fig = px.area(
+    fig = px.bar(
         df_prepared,
-        x="date",
+        x="commit_index",
         y="line_count",
         color="category",
         title=CHART_TITLE,
-        labels={"date": "", "line_count": "Total Lines"},
+        labels={"commit_index": "Commit", "line_count": "Total Lines"},
         category_orders={"category": category_order},
+        barmode="stack",
     )
 
     apply_common_layout(fig)

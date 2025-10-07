@@ -15,22 +15,11 @@ This file provides guidance to Claude Code when working with code in this reposi
 - **Visualisation**: Plotly Express for charts, Kaleido for WebP export
 - **Dependencies**: See [pyproject.toml](pyproject.toml) for complete list
 
-## Core Architecture
-
-**Data Flow:**
+## Data Flow
 
 - CLI → `git_history.generate_csv()` (traverse commits → calls count_lines → writes CSV)
 - CLI → `visualise.create_charts()` (loads CSV, filters data, delegates to chart modules)
   - Calls `chart_*.create()` modules following consistent pattern
-
-**Key Modules:**
-
-- `cli.py`: CLI entry point (simple single-command interface)
-- `git_history.py`: Traverses Git commits, extracts files, calls count_lines, writes CSV
-- `count_lines.py`: Pure utility: classifies Python source lines (no I/O)
-- `visualise.py`: Orchestrator: loads/filters CSV, delegates to chart modules
-- `theme.py`: Centralised Plotly theming (layout settings)
-- `chart_*.py`: Chart generation modules (e.g., evolution, breakdown)
 
 ## Commands
 
