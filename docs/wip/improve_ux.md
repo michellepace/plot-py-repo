@@ -2,15 +2,15 @@
 
 These are **rough ideas** to improve user experience.
 
-- Shared footer in `<visual_chart_enhancement_shared_footer>` tags
-- A new chart in `<new_chart>` tags
+- Shared footer in `<visual_chart_enhancement_shared_footer>` tags  - ✅ DONE
+- A new chart in `<new_chart>` tags - ✅ DONE
 - Better error handling for CLI experience in `<improve_cli_user_experience>` tags
 
 <ideas>
 
 <visual_chart_enhancement_shared_footer>
 
-✅ **COMPLETED**
+✅ **DONE**
 
 <requirements>
 
@@ -84,7 +84,10 @@ Styling:
 </improve_cli_user_experience>
 
 <new_chart>
-Branch: "feature/evolution-chart-by-commit"
+
+✅ **DONE**
+
+Branch: "feature/chart-evolution-commit"
 
 > Create a new chart module `chart_commit_evolution.py` following the established pattern in `chart_evolution.py`. Generate a stacked bar chart with commit index (1, 2, 3...) on the x-axis instead of dates. Follow TDD.
 
