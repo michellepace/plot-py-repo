@@ -4,7 +4,7 @@ These are **rough ideas** to improve user experience.
 
 - Shared footer in `<visual_chart_enhancement_shared_footer>` tags  - ✅ DONE
 - A new chart in `<new_chart>` tags - ✅ DONE
-- Better error handling for CLI experience in `<improve_cli_user_experience>` tags
+- Better error handling for CLI experience in `<improve_cli_user_experience>` tags - ✅ DONE
 
 <ideas>
 
@@ -72,14 +72,22 @@ Styling:
 
 <improve_cli_user_experience>
 
+✅ **DONE**
+
 ## CLI User Experience on Insensical inputs**
 
-   1. `uv run plot-py-repo --csv does_not_exist.csv`
-   2. `uv run plot-py-repo repo-does-not-exist`
-   3. `uv run plot-py-repo repo-does-not-have-git`
-   4. `uv run plot-py-repo repo-does-not-have-a-python-file`
-   5. `uv run plot-py-repo repo-does-not-have-at-least-one-of-src-or-tests-directory`
-   6. **IMPORTANT**: I thought I implemented error handling for 2-5, please investigate
+   1. ✅ `uv run plot-py-repo --csv does_not_exist.csv` - Shows: `❌  CSV file not found: does_not_exist.csv`
+   2. ✅ `uv run plot-py-repo repo-does-not-exist` - Shows: `❌  Directory not found so we couldn't look for Git repo`
+   3. ✅ `uv run plot-py-repo repo-does-not-have-git` - Shows: `❌  Not a Git repository`
+   4. ✅ `uv run plot-py-repo repo-does-not-have-a-python-file` - Shows: `❌  No Python files found in src/ or tests/ directories`
+   5. ✅ `uv run plot-py-repo repo-does-not-have-at-least-one-of-src-or-tests-directory` - Shows: `❌  No Python files found in src/ or tests/ directories`
+
+**Implementation:**
+- Fixed scenarios 1-2 (were showing stack traces)
+- Verified scenarios 3-5 (already had clean error handling)
+- Added 2 TDD tests: `test_nonexistent_repo_shows_clean_error()`, `test_nonexistent_csv_shows_clean_error()`
+- Error handling at I/O boundaries (`git_history.py`, `visualise.py`)
+- All 5 scenarios now show clean `❌` messages with no stack traces
 
 </improve_cli_user_experience>
 

@@ -106,3 +106,23 @@ def test_csv_flag_generates_images_from_existing_csv(tmp_path: Path) -> None:
     assert not (output_dir / "repo_history.csv").exists()
     assert (output_dir / "repo_evolution.webp").exists()
     assert (output_dir / "repo_breakdown.webp").exists()
+
+
+def test_nonexistent_repo_shows_clean_error() -> None:
+    """Shows clean error message when repository path doesn't exist."""
+    output, exit_code = run_cli("/path/that/does/not/exist")
+
+    assert exit_code == 1
+    assert "❌  Directory not found so we couldn't look for Git repo" in output
+    assert "Traceback" not in output
+    assert "FileNotFoundError" not in output
+
+
+def test_nonexistent_csv_shows_clean_error() -> None:
+    """Shows clean error message when CSV file doesn't exist."""
+    output, exit_code = run_cli("--csv", "does_not_exist.csv")
+
+    assert exit_code == 1
+    assert "❌  CSV file not found: does_not_exist.csv" in output
+    assert "Traceback" not in output
+    assert "FileNotFoundError" not in output

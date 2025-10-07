@@ -1,5 +1,6 @@
 """Visualization generation for Python repository evolution."""
 
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -9,23 +10,28 @@ from . import chart_breakdown, chart_evolution, chart_evolution_commit
 
 def _load_csv(csv_path: str) -> pd.DataFrame:
     """Load CSV history file containing Git commit metrics."""
-    df = pd.read_csv(
-        csv_path,
-        dtype={
-            "repo_name": str,
-            "commit_id": str,
-            "filedir": str,
-            "filename": str,
-            "code_lines": int,
-            "docstring_lines": int,
-            "comment_lines": int,
-            "total_lines": int,
-            "documentation_lines": int,
-        },
-    )
-    # Parse datetime with timezone preservation
-    df["commit_date"] = pd.to_datetime(df["commit_date"])
-    return df
+    try:
+        df = pd.read_csv(
+            csv_path,
+            dtype={
+                "repo_name": str,
+                "commit_id": str,
+                "filedir": str,
+                "filename": str,
+                "code_lines": int,
+                "docstring_lines": int,
+                "comment_lines": int,
+                "total_lines": int,
+                "documentation_lines": int,
+            },
+        )
+    except FileNotFoundError:
+        print(f"❌  CSV file not found: {csv_path}")
+        sys.exit(1)
+    else:
+        # Parse datetime with timezone preservation
+        df["commit_date"] = pd.to_datetime(df["commit_date"])
+        return df
 
 
 def _exclude_filenames(df: pd.DataFrame, filenames: list[str]) -> pd.DataFrame:

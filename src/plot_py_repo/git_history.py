@@ -44,6 +44,9 @@ def get_commits(repo_path: str) -> list[tuple[str, str]]:
             commit_hash = parts[0]
             git_timestamp = parts[1]
             commits.append((commit_hash, git_timestamp))
+    except FileNotFoundError as e:
+        msg = "Directory not found so we couldn't look for Git repo"
+        raise GitError(msg) from e
     except subprocess.CalledProcessError as e:
         error_msg = e.output.decode() if e.output else ""
         if "not a git repository" in error_msg.lower():
