@@ -12,9 +12,9 @@ def test_apply_common_layout_applies_theme_to_figure() -> None:
     fig = go.Figure()
     result = apply_common_layout(fig)
 
-    assert result.layout["width"] == 1600
-    assert result.layout["height"] == 900
-    assert result.layout["template"] == pio.templates["plotly_white"]
+    assert result.layout["width"] == 700
+    assert result.layout["height"] == 500
+    assert result.layout["template"] == pio.templates["plotly_dark"]
     assert result.layout["legend"]["orientation"] == "h"
     assert result is fig  # Confirms in-place modification
 

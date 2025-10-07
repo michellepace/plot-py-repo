@@ -1,13 +1,15 @@
 """Centralised theming for Plotly visualisations."""
 
+from pathlib import Path
+
 import pandas as pd
 from plotly.graph_objects import Figure
 
 # Standard layout settings applied to all charts
 DEFAULT_LAYOUT = {
-    "template": "plotly_white",  # plotly_dark, simple_white
-    "width": 1600,
-    "height": 900,
+    "template": "plotly_dark",  # plotly_white, simple_white
+    "width": 700,
+    "height": 500,
     # Explicit margins for precise positioning
     "margin": {
         "l": 80,  # Left margin
@@ -75,9 +77,22 @@ def add_footnote_annotation(
         y=-0.17,
         text=footer_text,
         showarrow=False,
-        font={"size": 10, "color": "#5E5D59"},
+        font={"size": 11, "color": "#778899"},
         xanchor="left",
         yanchor="top",
     )
 
     return fig
+
+
+def save_chart_image(fig: Figure, output_path: Path) -> None:
+    """Save chart to WebP with standard scale factor for optimal text sizing.
+
+    Uses scale=2 to render at base dimensions (700x500) then scale up to 1400x1000.
+    This produces larger text and markers relative to canvas size for better readability.
+
+    Args:
+        fig: Plotly figure to save
+        output_path: Path where WebP image should be saved
+    """
+    fig.write_image(output_path, scale=2)

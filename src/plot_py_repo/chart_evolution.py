@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 
-from .theme import add_footnote_annotation, apply_common_layout
+from .theme import add_footnote_annotation, apply_common_layout, save_chart_image
 
 CHART_TITLE = "Repository Growth Over Time"
 
@@ -111,4 +111,4 @@ def _plot_and_save(
     add_footnote_annotation(
         fig, repository_name=repo_name, latest_commit_date=latest_commit_date
     )
-    fig.write_image(str(output_path), scale=2)
+    save_chart_image(fig, output_path)
