@@ -60,6 +60,7 @@ uv run ruff check --fix                         # Lint and auto-fix
 uv run ruff format                              # Format code
 uv run pyright                                  # Type check
 uv run pre-commit run --all-files               # Run all pre-commit hooks
+npx markdownlint-cli2 --fix '**/*.md'           # Lint and auto-fix Markdown
 ```
 
 ## Code Design Principles: Elegant Simplicity over Over-Engineered (YAGNI)
