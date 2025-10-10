@@ -83,6 +83,7 @@ Styling:
    5. ✅ `uv run plot-py-repo repo-does-not-have-at-least-one-of-src-or-tests-directory` - Shows: `❌  No Python files found in src/ or tests/ directories`
 
 **Implementation:**
+
 - Fixed scenarios 1-2 (were showing stack traces)
 - Verified scenarios 3-5 (already had clean error handling)
 - Added 2 TDD tests: `test_nonexistent_repo_shows_clean_error()`, `test_nonexistent_csv_shows_clean_error()`
