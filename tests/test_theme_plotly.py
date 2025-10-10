@@ -4,7 +4,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
 
-from plot_py_repo.theme import _format_date, add_footnote_annotation, apply_common_layout
+from plot_py_repo.theme_plotly import (
+    _format_date,
+    add_footnote_annotation,
+    apply_common_layout,
+)
 
 
 def test_apply_common_layout_applies_theme_to_figure() -> None:

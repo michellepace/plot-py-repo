@@ -6,7 +6,7 @@ from typing import cast
 import pandas as pd
 import plotly.express as px
 
-from .theme import add_footnote_annotation, apply_common_layout, save_chart_image
+from .theme_plotly import add_footnote_annotation, apply_common_layout, save_chart_image
 
 CHART_TITLE = "Repository Breakdown by File"
 
