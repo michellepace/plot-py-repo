@@ -1,6 +1,6 @@
 """Tests for commit-indexed stacked bar chart: data transformation and image export."""
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
@@ -13,6 +13,9 @@ from plot_py_repo.chart_evolution_commit import (
     _prepare_data,
     create,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 # Chapter 1: Data Contract

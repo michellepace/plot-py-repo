@@ -1,10 +1,13 @@
 """Tests for visualise module."""
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pandas as pd
 
 from plot_py_repo.visualise import _exclude_filenames, _load_csv
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_load_csv_loads_dataframe(tmp_path: Path) -> None:

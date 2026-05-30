@@ -91,7 +91,7 @@ uv run pytest                     # Run all tests
 uv run pre-commit run --all-files # Run all hooks
 ```
 
-**Tech Stack**: Python 3.13+, Plotly Express, Pandas, Kaleido • See [CLAUDE.md](.claude/CLAUDE.md)
+**Tech Stack**: Python 3.14+, Plotly Express, Pandas, Kaleido • See [CLAUDE.md](.claude/CLAUDE.md)
 
 **Test Driven Development**: 59 tests (5 slow, 54 unit, ~14 seconds)
 

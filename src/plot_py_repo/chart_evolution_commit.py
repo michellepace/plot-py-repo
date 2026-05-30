@@ -1,13 +1,16 @@
 """Stacked bar chart visualising repository growth by commit index."""
 
-from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
-import pandas as pd
 import plotly.express as px
 
 from .theme_plotly import add_footnote_annotation, apply_common_layout, save_chart_image
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pandas as pd
 
 CHART_TITLE = "Repository Growth by Commit"
 

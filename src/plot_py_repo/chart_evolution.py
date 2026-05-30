@@ -1,13 +1,16 @@
 """Stacked area chart visualising repository growth over time."""
 
-from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
-import pandas as pd
 import plotly.express as px
 
 from .theme_plotly import add_footnote_annotation, apply_common_layout, save_chart_image
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pandas as pd
 
 CHART_TITLE = "Repository Growth Over Time"
 
@@ -51,7 +54,9 @@ def _prepare_data(df_per_file: pd.DataFrame) -> pd.DataFrame:
     df["date"] = df["commit_date"].dt.date
 
     # Filter to latest commit per date
-    latest_per_date = df.groupby("date")["commit_date"].max().reset_index()
+    latest_per_date = cast(
+        "pd.DataFrame", df.groupby("date", as_index=False)["commit_date"].max()
+    )
     df = df.merge(latest_per_date, on=["date", "commit_date"], how="inner")
 
     # Transform wide format to long format

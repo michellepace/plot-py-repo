@@ -1,12 +1,15 @@
 """Breakdown chart generation for Python repository evolution."""
 
-from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-import pandas as pd
 import plotly.express as px
 
 from .theme_plotly import add_footnote_annotation, apply_common_layout, save_chart_image
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pandas as pd
 
 CHART_TITLE = "Repository Breakdown by File"
 
