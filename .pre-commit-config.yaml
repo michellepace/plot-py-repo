@@ -1,20 +1,20 @@
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.5
+    rev: 0.11.17
     hooks:
       - id: uv-lock
 
   - repo: local
     hooks:
-      - id: ruff-format
-        name: ruff format
-        entry: uv run ruff format
-        language: system
-        types: [python]
-        pass_filenames: false
       - id: ruff-check
         name: ruff check
         entry: uv run ruff check --fix --exit-non-zero-on-fix
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
         language: system
         types: [python]
         pass_filenames: false
@@ -32,9 +32,9 @@ repos:
         pass_filenames: false
 
 # Notes:
-# 1. Hook order: uv-lock (instant) → ruff-format (auto-fix) → ruff-check (validate) → pyright (type check) → pytest (slowest)
-# 2. `uv-lock` validates lockfile matches pyproject.toml (official Astral hook)
-# 3. All other tools use `uv run` for single source of truth (pyproject.toml versions)
-# 4. `ruff-format` runs before `ruff-check` so linting validates formatted code
-# 5. `--exit-non-zero-on-fix` blocks commits when ruff-check auto-fixes, forcing review
-# 6. `pass_filenames: false` runs tools on entire codebase for consistency
+# 1. Order: uv-lock → ruff-check (auto-fix) → ruff-format → pyright → pytest (slowest last)
+# 2. `uv-lock` regenerates uv.lock to match pyproject.toml; any change fails the commit (official Astral hook)
+# 3. Local hooks use `uv run`, so versions come from pyproject.toml (single source of truth)
+# 4. ruff-check (autofix) precedes ruff-format so the formatter runs last on the final code
+# 5. `--exit-non-zero-on-fix` fails the commit when ruff-check auto-fixes, forcing review
+# 6. `pass_filenames: false` runs each tool over the whole codebase, not just staged files
