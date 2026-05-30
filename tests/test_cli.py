@@ -1,9 +1,12 @@
 """Simple CLI user flow tests for plot-py-repo."""
 
 import subprocess
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def run_cli(*args: str) -> tuple[str, int]:

@@ -1,9 +1,12 @@
 """Centralised theming for Plotly visualisations."""
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-import pandas as pd
-from plotly.graph_objects import Figure
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pandas as pd
+    from plotly.graph_objects import Figure
 
 # Standard layout settings applied to all charts
 DEFAULT_LAYOUT = {

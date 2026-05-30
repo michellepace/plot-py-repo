@@ -10,7 +10,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ## Tech Stack
 
-- **Python**: 3.13+
+- **Python**: 3.14+
 - **Testing**: pytest with `tmp_path` fixtures
 - **Visualisation**: Plotly Express for charts, Kaleido for WebP export
 - **Dependencies**: See [pyproject.toml](pyproject.toml) for complete list

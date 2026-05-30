@@ -1,11 +1,14 @@
 """Tests for horizontal bar chart: data filtering, sorting, and image export."""
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
 
 from plot_py_repo.chart_breakdown import _prepare_data, create
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 # Chapter 1: Data Contract
