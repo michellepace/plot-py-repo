@@ -2,17 +2,17 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-
       "Bash(uv --help *)",
-      "Bash(uv *)"
+      "Bash(uv run *)"
     ],
     "deny": [
       "Read(**/.env)",
-      "Read(**/.envrc)",
-      "Read(**/.pytest_cache)",
-      "Read(**/.ruff_cache)"
+      "Read(**/.envrc)"
     ],
     "ask": []
+  },
+  "enabledPlugins": {
+    "git-utils@my-claude-marketplace": true
   },
   "extraKnownMarketplaces": {
     "my-claude-marketplace": {
@@ -21,8 +21,5 @@
         "repo": "michellepace/my-claude-marketplace"
       }
     }
-  },
-  "enabledPlugins": {
-    "git-utils@my-claude-marketplace": true
   }
 }
