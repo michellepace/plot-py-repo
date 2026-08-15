@@ -1,15 +1,13 @@
-globs:
-  - "**/*.md" # All .md files; pruned by ignores below
+gitignore: true
 
-ignores:
-  - ".venv/**"
-  - ".pytest_cache/**"
-  - "__pycache__/**"
-
-# Disable rules
 config:
-  default: true # Enable all rules by default
-  MD013: false  # don't enforce a maximum line length
-  MD033: false  # don't forbid inline HTML
-  MD036: false  # don't forbid emphasis instead of a heading
-  MD041: false  # don't require first line to be H1 heading
+  default: true     # Enable all rules
+
+# false == RULE OFF
+  MD013: false      # enforce a maximum line length
+  MD033: false      # forbid inline HTML
+  MD036: false      # forbid emphasis instead of a heading
+  MD041: false      # require first line to be H1 heading
+
+  MD060:            # enforce consistent table column style
+    style: compact  # single space around cell content

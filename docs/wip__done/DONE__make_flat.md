@@ -323,7 +323,7 @@ return (
 ## Combined Impact Matrix
 
 | Decision 1 (CSV) | Decision 2 (Blanks) | CSV Total Lines | Equation | Status |
-|-----------------|---------------------|-----------------|----------|----------------|
+| :--- | :--- | :--- | :--- | :--- |
 | Long (old) | Exclude (old) | 28 | ❌ sum ≠ total | Deprecated |
 | Long | Include | 39 | ✓ sum = total | Not implemented |
 | Wide | Exclude | 28 | ❌ sum ≠ total | Not implemented |

@@ -40,7 +40,7 @@ Proven script exists, needs modification for CSV output and Git.
 Currently:
 
 ```bash
-~/projects/python/youtube-to-xml git:(main) ✗ 
+~/projects/python/youtube-to-xml git:(main) ✗
 $ uv run scripts/count_python_lines.py src/youtube_to_xml/file_parser.py
 Actual code lines: 139
 Docstring lines:    52
