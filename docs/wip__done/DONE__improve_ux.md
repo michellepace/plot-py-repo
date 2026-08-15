@@ -30,7 +30,7 @@ These are **rough ideas** to improve user experience.
 
 The footer should be positioning should be "dynamic" in that if I were to change the default figure width and height that it would still be positioned at an offset from the left and bottom of the page. I am open to how this is best implemented as I do not know Plotly Express specifics or indeed theming.
 
-I have curated Plotly Express documentation in `docs/reference/plotly_theming.md` which may be of assistance. Else, please research how to elegantly do this.
+I have curated Plotly Express documentation in `docs/reference/plotly-theming.md` which may be of assistance. Else, please research how to elegantly do this.
 
 ## Test Driven Development
 

@@ -1,6 +1,25 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]  # keep md hard line breaks
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.2
+    hooks:
+      - id: markdownlint-cli2 # rules .markdownlint-cli2.yaml
+        args: [--fix]         # autofix
+
+  - repo: https://github.com/ComPWA/taplo-pre-commit
+    rev: v0.9.3
+    hooks:
+      - id: taplo-format
+        types: [toml]
+
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.17
+    rev: 0.12.5
     hooks:
       - id: uv-lock
 
@@ -32,9 +51,8 @@ repos:
         pass_filenames: false
 
 # Notes:
-# 1. Order: uv-lock → ruff-check (auto-fix) → ruff-format → pyright → pytest (slowest last)
-# 2. `uv-lock` regenerates uv.lock to match pyproject.toml; any change fails the commit (official Astral hook)
-# 3. Local hooks use `uv run`, so versions come from pyproject.toml (single source of truth)
-# 4. ruff-check (autofix) precedes ruff-format so the formatter runs last on the final code
-# 5. `--exit-non-zero-on-fix` fails the commit when ruff-check auto-fixes, forcing review
-# 6. `pass_filenames: false` runs each tool over the whole codebase, not just staged files
+# 1. `uv-lock` regenerates uv.lock to match pyproject.toml; any change fails the commit
+# 2. Local hooks use `uv run`, so versions come from pyproject.toml
+# 3. ruff-check (autofix) precedes ruff-format so formatter runs on the final code
+# 4. `--exit-non-zero-on-fix` fails the commit when ruff-check auto-fixes, forcing review
+# 5. `pass_filenames: false` runs each tool over the whole codebase, not just staged files

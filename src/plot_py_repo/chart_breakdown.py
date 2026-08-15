@@ -28,7 +28,7 @@ def create(df: pd.DataFrame, output_path: Path) -> None:
 
 
 def _prepare_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Extract latest commit data and return file-level line counts sorted descending."""
+    """Extract latest commit and return file-level line counts sorted descending."""
     latest_commit_date = df["commit_date"].max()
     return (
         df[df["commit_date"] == latest_commit_date]

@@ -326,7 +326,9 @@ String literal (not docstring) line 3 of 5
 
         # Verify total line count in content
         total_lines = len(content.splitlines())
-        assert total_lines == 40, f"Expected 40 total lines in content, got {total_lines}"
+        assert total_lines == 40, (
+            f"Expected 40 total lines in content, got {total_lines}"
+        )
 
         # Verify equation: docstrings + comments + code = total
         sum_counts = docstrings_cnt + comments_cnt + code_cnt

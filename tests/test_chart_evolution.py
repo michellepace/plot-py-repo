@@ -1,4 +1,4 @@
-"""Tests for stacked area chart: data transformation, categorisation, and image export."""
+"""Tests for stacked area chart: transformation, categorisation, and image export."""
 
 from typing import TYPE_CHECKING
 
@@ -145,8 +145,12 @@ def test_prepare_data_aggregates_lines_by_category() -> None:
 
     result = _prepare_data(df)
 
-    assert result[result["category"] == CATEGORY_SOURCE_CODE]["line_count"].item() == 150
-    assert result[result["category"] == CATEGORY_CODE_COMMENTS]["line_count"].item() == 20
+    assert (
+        result[result["category"] == CATEGORY_SOURCE_CODE]["line_count"].item() == 150
+    )
+    assert (
+        result[result["category"] == CATEGORY_CODE_COMMENTS]["line_count"].item() == 20
+    )
 
 
 # Chapter 3: Helper Functions
@@ -173,7 +177,9 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
     df = pd.DataFrame(
         {
             "repo_name": ["test-repo", "test-repo"],
-            "commit_date": pd.to_datetime(["2024-01-01T10:00:00", "2024-01-02T10:00:00"]),
+            "commit_date": pd.to_datetime(
+                ["2024-01-01T10:00:00", "2024-01-02T10:00:00"]
+            ),
             "filedir": ["src", "src"],
             "code_lines": [100, 150],
             "documentation_lines": [15, 23],

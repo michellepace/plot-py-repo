@@ -17,7 +17,7 @@ This test suite represents **excellent testing practices** for a pure function. 
 ### Quality Scorecard
 
 | Dimension | Score | Assessment |
-|-----------|-------|------------|
+| :--- | :--- | :--- |
 | **Strategy & Design** | ⭐⭐⭐⭐⭐ 5/5 | Excellent behavior-driven approach with clear test boundaries |
 | **Organization** | ⭐⭐⭐⭐⭐ 5/5 | Perfect logical grouping using test classes |
 | **Clarity** | ⭐⭐⭐⭐⭐ 5/5 | Outstanding naming, docstrings, and readability |
@@ -54,7 +54,7 @@ def test_multiline_module_docstring_counts_as_docstring(self) -> None:
 ### Testing Approach Matrix
 
 | Aspect | Your Approach | Why It's Good |
-|--------|--------------|---------------|
+| :--- | :--- | :--- |
 | **Test Subject** | Pure function (`classify_lines`) | No side effects = easy to test, deterministic |
 | **Test Data** | Inline strings | Self-contained, readable, no external files needed |
 | **Assertions** | Custom helper (`_assert_count`) | Clear error messages, DRY principle |
@@ -164,7 +164,7 @@ test_<what>_<expected_behavior>
 #### Naming Quality Examples
 
 | Test Name | Clarity Score | Analysis |
-|-----------|---------------|----------|
+| :--- | :--- | :--- |
 | `test_empty_content()` | ⭐⭐⭐☆☆ Good | Clear subject, implicit expectation |
 | `test_single_blank_line()` | ⭐⭐⭐☆☆ Good | Clear subject, implicit expectation |
 | `test_blank_lines_between_code_not_counted()` | ⭐⭐⭐⭐⭐ Excellent | States both subject AND expected behavior |
@@ -204,7 +204,7 @@ def _assert_count(category: str, expected: int, actual: int) -> None:
 **Error Message Comparison:**
 
 | Approach | Error Message |
-|----------|---------------|
+| :--- | :--- |
 | **Plain assert** | `AssertionError: assert 3 == 5` |
 | **Your helper** | `AssertionError: Expected 5 docstring line(s), got 3` |
 
@@ -217,7 +217,7 @@ The helper provides **instant context** without reading the test code.
 ### Test Distribution by Category
 
 | Category | Test Count | Coverage Assessment |
-|----------|-----------|---------------------|
+| :--- | :--- | :--- |
 | **Edge Cases** | 4 | ✅ Excellent — covers empty, blank, minimal |
 | **Docstrings** | 6 | ✅ Excellent — module, function, class, async, nested |
 | **Comments** | 2 | ⚠️ Good — covers main distinction (standalone vs inline) |
@@ -229,7 +229,7 @@ The helper provides **instant context** without reading the test code.
 ### Coverage Matrix
 
 | Python Feature | Tested? | Test Location |
-|----------------|---------|---------------|
+| :--- | :--- | :--- |
 | Module docstring | ✅ Yes | `test_single_line_module_docstring...` |
 | Function docstring | ✅ Yes | `test_function_docstring...` |
 | Class docstring | ✅ Yes | `test_class_docstring...` |
@@ -294,7 +294,7 @@ def test_classify_lines_comprehensive(self) -> None:
 ### Strengths (What You Did Right)
 
 | Strength | Evidence | Impact |
-|----------|----------|--------|
+| :--- | :--- | :--- |
 | **🎯 Single Responsibility** | Each test verifies one behavior | Tests fail for one clear reason |
 | **📝 Excellent Documentation** | Every test has clear docstring | New developers understand quickly |
 | **🔄 Consistent Patterns** | AAA pattern in all tests | Reduces cognitive load |
@@ -342,7 +342,7 @@ class TestBad:
 ### Minor Coverage Gaps
 
 | Gap | Risk Level | Example Missing Test |
-|-----|-----------|---------------------|
+| :--- | :--- | :--- |
 | **Method docstrings** | 🟡 Low | Docstrings in class methods vs functions |
 | **Property decorators** | 🟡 Low | `@property` with docstrings |
 | **Quote style variations** | 🟢 Very Low | `'''docstring'''` vs `"""docstring"""` |
@@ -398,6 +398,7 @@ def test_function_docstring_counts_as_docstring(self) -> None:
     _assert_count("comment line(s)", 0, comments_cnt)
     _assert_count("code line(s)", 2, code_cnt)
 
+
 def test_async_function_docstring_counts_as_docstring(self) -> None:
     """Async functions follow same docstring rules as regular functions."""
     content = '''async def fetch():
@@ -415,6 +416,7 @@ def test_async_function_docstring_counts_as_docstring(self) -> None:
 ```python
 import pytest
 
+
 @pytest.mark.parametrize(
     "content,expected_docstrings,expected_comments,expected_code",
     [
@@ -423,7 +425,9 @@ import pytest
     """Function docstring."""
     pass
 ''',
-            1, 0, 2,
+            1,
+            0,
+            2,
             id="function_docstring",
         ),
         pytest.param(
@@ -431,7 +435,9 @@ import pytest
     """Async docstring."""
     pass
 ''',
-            1, 0, 2,
+            1,
+            0,
+            2,
             id="async_function_docstring",
         ),
         pytest.param(
@@ -439,7 +445,9 @@ import pytest
     """Class docstring."""
     pass
 ''',
-            1, 0, 2,
+            1,
+            0,
+            2,
             id="class_docstring",
         ),
     ],
@@ -614,6 +622,7 @@ class TestErrorHandling:
 ```python
 import pytest
 
+
 class TestIntegration:
     """End-to-end classification scenarios."""
 
@@ -718,6 +727,7 @@ For exhaustive edge case testing, consider `hypothesis`:
 ```python
 from hypothesis import given, strategies as st
 
+
 @given(st.text())
 def test_classify_lines_never_crashes(content: str) -> None:
     """Function handles any input without crashing."""
@@ -785,7 +795,7 @@ Apply these patterns to other tests in your codebase:
 ## 🎯 Final Recommendations Summary
 
 | Priority | Recommendation | Effort | Value |
-|----------|---------------|--------|-------|
+| :--- | :--- | :--- | :--- |
 | **🟢 Low** | Keep current approach — it's excellent | - | High |
 | **🟡 Medium** | Add method docstring test | 5 min | Medium |
 | **🟡 Medium** | Add quote style variation test | 5 min | Low |

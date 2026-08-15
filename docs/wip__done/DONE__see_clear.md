@@ -216,8 +216,8 @@ Tests complete flow:
 ```python
 # === Docstring Classification ===
 
-def test_single_line_module_docstring_counts_as_docstring():
-    ...
+
+def test_single_line_module_docstring_counts_as_docstring(): ...
 ```
 
 **Pros:** Simpler, less code
