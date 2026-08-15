@@ -77,7 +77,7 @@ reportDuplicateImport = false   # Ruff F811 handles it
 
 [tool.ruff]
 # Strictest ruff settings
-line-length = 90
+line-length = 88
 target-version = "py314"
 
 [tool.ruff.lint]

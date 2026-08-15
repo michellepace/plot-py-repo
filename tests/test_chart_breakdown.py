@@ -76,7 +76,7 @@ def test_prepare_data_filters_to_latest_commit_only() -> None:
 
 
 def test_prepare_data_sorts_by_line_count_descending() -> None:
-    """Files sorted by line count descending (largest first for horizontal bar chart)."""
+    """Files sorted by line count descending (largest first for horizontal bars)."""
     df = pd.DataFrame(
         {
             "repo_name": ["test-repo"] * 3,
@@ -106,7 +106,9 @@ def test_create_generates_webp_file(tmp_path: Path) -> None:
     df = pd.DataFrame(
         {
             "repo_name": ["test-repo", "test-repo"],
-            "commit_date": pd.to_datetime(["2024-01-01T10:00:00", "2024-01-02T10:00:00"]),
+            "commit_date": pd.to_datetime(
+                ["2024-01-01T10:00:00", "2024-01-02T10:00:00"]
+            ),
             "filedir": ["src", "tests"],
             "filename": ["module.py", "test_module.py"],
             "total_lines": [115, 58],

@@ -92,7 +92,7 @@ def save_chart_image(fig: Figure, output_path: Path) -> None:
     """Save chart to WebP with standard scale factor for optimal text sizing.
 
     Uses scale=2 to render at base dimensions (700x500) then scale up to 1400x1000.
-    This produces larger text and markers relative to canvas size for better readability.
+    This produces larger text and markers relative to canvas size for readability.
 
     Args:
         fig: Plotly figure to save

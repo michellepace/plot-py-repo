@@ -47,7 +47,9 @@ def create_charts(csv_path: str, output_dir: str) -> None:
 
     output_path = Path(output_dir)
     chart_evolution.create(filtered_df, output_path / "repo_evolution.webp")
-    chart_evolution_commit.create(filtered_df, output_path / "repo_evolution_commit.webp")
+    chart_evolution_commit.create(
+        filtered_df, output_path / "repo_evolution_commit.webp"
+    )
     chart_breakdown.create(filtered_df, output_path / "repo_breakdown.webp")
 
     print(f"✅  Created {output_path / 'repo_evolution.webp'}")

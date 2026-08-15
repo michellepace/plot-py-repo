@@ -102,7 +102,9 @@ def test_csv_flag_generates_images_from_existing_csv(tmp_path: Path) -> None:
     output_dir.mkdir()
 
     # Run CLI with --csv flag
-    _output, exit_code = run_cli("--csv", str(csv_file), "--output-dir", str(output_dir))
+    _output, exit_code = run_cli(
+        "--csv", str(csv_file), "--output-dir", str(output_dir)
+    )
 
     # Should create images but NOT regenerate CSV
     assert exit_code == 0
