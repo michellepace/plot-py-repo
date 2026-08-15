@@ -1,15 +1,7 @@
-# =================================
-# Build System
-# =================================
-
 [build-system]
-requires = ["uv_build>=0.8.14,<0.9.0"]
+# Packaged but never published.
+requires = ["uv_build>=0.12.1,<0.13"]
 build-backend = "uv_build"
-
-
-# =================================
-# Project Metadata & Configuration
-# =================================
 
 [project]
 name = "plot-py-repo"
@@ -18,80 +10,64 @@ description = "Visualise Python repository evolution through Git history"
 readme = "README.md"
 authors = [{ name = "Michelle", email = "your.email@example.com" }]
 requires-python = ">=3.14"
-dependencies = [        # runtime
-    "kaleido>=1.3.0",
-    "pandas>=3.0.3",
-    "plotly>=6.7.0",
+dependencies = [
+  "kaleido>=1.3.0", # WebP export
+  "pandas>=3.0.3",  # CSV load, filter, aggregate
+  "plotly>=6.7.0",  # chart rendering
 ]
 
-# CLI entry points
 [project.scripts]
 plot-py-repo = "plot_py_repo.cli:main"
 
-# Development dependencies
 [dependency-groups]
 dev = [
-    "pre-commit>=4.6.0",
-    "pyright>=1.1.409",
-    "pytest>=9.0.3",
-    "ruff>=0.15.15",
+  "pre-commit>=4.6.0",
+  "pyright>=1.1.409",
+  "pytest>=9.0.3",
+  "ruff>=0.15.15",
 ]
 
-# =================================
-# Package Manager Configuration
-# =================================
 
-# Allow PyPI nightly builds (❌ DISABLED to use stable releases only)
-#[tool.uv]
-#prerelease = "allow"
-
-
+# TESTING (PYTEST)
 # =================================
-# Pytest Configuration
-# =================================
-
 [tool.pytest.ini_options]
-markers = [
-    "slow: tests that generate images (≈3s per image)"
-]
+markers = ["slow: tests that generate images (≈3s per image)"]
 
-# =================================
-# Pyright Type Checking
-# =================================
 
+# TYPE CHECKING (PYRIGHT)
+# =================================
 [tool.pyright]
-# Type checker is needed as Ruff is only a linter
-# Used by the `uv run pyright` CLI (pre-commit) and VSCode's Pylance extension.
-
-typeCheckingMode = "standard"
+typeCheckingMode = "standard" # Keep (not strict!)
 pythonVersion = "3.14"
+reportUnusedImport = false    # Ruff F401
+reportUnusedVariable = false  # Ruff F841
+reportDuplicateImport = false # Ruff F811
 
-# Silence checks already covered by Ruff to avoid duplicate diagnostics
-reportUnusedImport = false      # Ruff F401 handles it
-reportUnusedVariable = false    # Ruff F841 handles it
-reportDuplicateImport = false   # Ruff F811 handles it
 
+# LINTING (RUFF)
 # =================================
-# Ruff Linter Configuration
-# =================================
-
 [tool.ruff]
-# Strictest ruff settings
 line-length = 88
 target-version = "py314"
 
 [tool.ruff.lint]
-# Enable all available rules
 select = ["ALL"]
-# Only ignore rules that are incompatible or overly pedantic
-ignore = [
-    "D100",    # Missing docstring in public module
-    "D104",    # Missing docstring in public package
-    "D203",    # 1 blank line required before class docstring (conflicts with D211)
-    "D213",    # Multi-line docstring summary should start at the second line (conflicts with D212)
-    "COM812",  # Trailing comma missing (conflicts with formatter)
-    "ISC001",  # Implicitly concatenated string literals on one line (conflicts with formatter)
-    "T201",    # Print found (allow print statements)
+ignore = [ # ignore incompatible or overly pedantic rules
+  "D100",   # Missing docstring in public module
+  "D104",   # Missing docstring in public package
+  "D203",   # blank line before class docstring (conflicts with D211)
+  "D213",   # multi-line summary starts on line 2 (conflicts with D212)
+  "COM812", # Trailing comma missing (conflicts with formatter)
+  "ISC001", # implicit string concatenation (conflicts with formatter)
+  "T201",   # Print found (allow print statements)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+  "D103",    # Missing docstring in public function
+  "PLR2004", # Magic value used in comparison
+  "S101",    # Use of assert detected
+  "S607",    # Partial executable paths (git commands in tests)
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -105,11 +81,3 @@ max-statements = 50
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
-
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = [
-    "D103",    # Missing docstring in public function
-    "PLR2004", # Magic value used in comparison
-    "S101",    # Use of assert detected
-    "S607",    # Starting process with partial executable path (git commands in tests)
-]
