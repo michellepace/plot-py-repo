@@ -147,7 +147,9 @@ f.write(f"...documentation,{documentation_lines}\n")
 docstring_lines, comment_lines, code_lines = classify_lines(content)
 total_lines = len(content.splitlines())
 documentation_lines = docstring_lines + comment_lines
-f.write(f"...{code_lines},{docstring_lines},{comment_lines},{total_lines},{documentation_lines}\n")
+f.write(
+    f"...{code_lines},{docstring_lines},{comment_lines},{total_lines},{documentation_lines}\n"
+)
 ```
 
 **`chart_evolution.py` (_prepare_data, implemented approach):**
@@ -172,7 +174,9 @@ df_code = df[["commit_date", "commit_id", "filedir", "filename", "code_lines"]].
 df_code["category"] = "code"
 df_code["line_count"] = df_code["code_lines"]
 
-df_docs = df[["commit_date", "commit_id", "filedir", "filename", "documentation_lines"]].copy()
+df_docs = df[
+    ["commit_date", "commit_id", "filedir", "filename", "documentation_lines"]
+].copy()
 df_docs["category"] = "documentation"
 df_docs["line_count"] = df_docs["documentation_lines"]
 
@@ -188,9 +192,7 @@ df_modules = df_latest.groupby(["filedir", "filename"])["line_count"].sum()
 
 # Implemented (wide format calculates total from components)
 df_latest["line_count"] = (
-    df_latest["docstring_lines"]
-    + df_latest["comment_lines"]
-    + df_latest["code_lines"]
+    df_latest["docstring_lines"] + df_latest["comment_lines"] + df_latest["code_lines"]
 )
 df_files = df_latest.loc[:, ["filedir", "filename", "line_count"]].copy()
 

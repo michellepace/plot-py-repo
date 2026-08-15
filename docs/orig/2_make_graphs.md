@@ -107,8 +107,8 @@ For each graph script:
 ```python
 import plotly.express as px
 
-fig = px.area(df, x='commit_date', y='line_count', color='category')
-fig.update_layout(template='plotly_white', title='My Chart')
+fig = px.area(df, x="commit_date", y="line_count", color="category")
+fig.update_layout(template="plotly_white", title="My Chart")
 fig.write_image("evolution.webp", width=1600, height=900, scale=2)
 ```
 

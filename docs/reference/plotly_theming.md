@@ -18,8 +18,8 @@ To see information about the available themes and the current default theme, dis
 
 ```python
 import plotly.io as pio
-pio.templates
 
+pio.templates
 ```
 
 ```python
@@ -44,11 +44,26 @@ import plotly.express as px
 df = px.data.gapminder()
 df_2007 = df.query("year==2007")
 
-for template in ["plotly", "plotly_white", "plotly_dark", "ggplot2", "seaborn", "simple_white", "none"]:
-    fig = px.scatter(df_2007,
-                     x="gdpPercap", y="lifeExp", size="pop", color="continent",
-                     log_x=True, size_max=60,
-                     template=template, title="Gapminder 2007: '%s' theme" % template)
+for template in [
+    "plotly",
+    "plotly_white",
+    "plotly_dark",
+    "ggplot2",
+    "seaborn",
+    "simple_white",
+    "none",
+]:
+    fig = px.scatter(
+        df_2007,
+        x="gdpPercap",
+        y="lifeExp",
+        size="pop",
+        color="continent",
+        log_x=True,
+        size_max=60,
+        template=template,
+        title="Gapminder 2007: '%s' theme" % template,
+    )
     fig.show()
 ```
 
@@ -60,7 +75,9 @@ The theme for a particular graph object figure can be specified by setting the `
 import plotly.graph_objects as go
 import pandas as pd
 
-z_data = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/api_docs/mt_bruno_elevation.csv")
+z_data = pd.read_csv(
+    "https://raw.githubusercontent.com/plotly/datasets/master/api_docs/mt_bruno_elevation.csv"
+)
 
 fig = go.Figure(
     data=go.Surface(z=z_data.values),
@@ -68,12 +85,22 @@ fig = go.Figure(
         title=dict(text="Mt Bruno Elevation"),
         width=500,
         height=500,
-    ))
+    ),
+)
 
-for template in ["plotly", "plotly_white", "plotly_dark", "ggplot2", "seaborn", "simple_white", "none"]:
-    fig.update_layout(template=template, title=dict(text="Mt Bruno Elevation: '%s' theme" % template))
+for template in [
+    "plotly",
+    "plotly_white",
+    "plotly_dark",
+    "ggplot2",
+    "seaborn",
+    "simple_white",
+    "none",
+]:
+    fig.update_layout(
+        template=template, title=dict(text="Mt Bruno Elevation: '%s' theme" % template)
+    )
     fig.show()
-
 ```
 
 #### Specifying a default themes [¶](https://plotly.com/python/templates/\#Specifying-a-default-themes)
@@ -93,12 +120,17 @@ pio.templates.default = "plotly_white"
 df = px.data.gapminder()
 df_2007 = df.query("year==2007")
 
-fig = px.scatter(df_2007,
-                 x="gdpPercap", y="lifeExp", size="pop", color="continent",
-                 log_x=True, size_max=60,
-                 title="Gapminder 2007: current default theme")
+fig = px.scatter(
+    df_2007,
+    x="gdpPercap",
+    y="lifeExp",
+    size="pop",
+    color="continent",
+    log_x=True,
+    size_max=60,
+    title="Gapminder 2007: current default theme",
+)
 fig.show()
-
 ```
 
 ## Creating themes
@@ -121,8 +153,7 @@ large_rockwell_template = dict(
 )
 
 fig = go.Figure()
-fig.update_layout(title=dict(text="Figure Title"),
-                  template=large_rockwell_template)
+fig.update_layout(title=dict(text="Figure Title"), template=large_rockwell_template)
 fig.show()
 ```
 
@@ -171,12 +202,9 @@ annotation_template.layout.annotationdefaults = dict(font=dict(color="crimson"))
 
 fig = go.Figure()
 fig.update_layout(
-     template=annotation_template,
-     annotations=[
-         dict(text="Look Here", x=1, y=1),
-         dict(text="Look There", x=2, y=2)
-     ]
- )
+    template=annotation_template,
+    annotations=[dict(text="Look Here", x=1, y=1), dict(text="Look There", x=2, y=2)],
+)
 fig.show()
 ```
 
@@ -207,7 +235,7 @@ draft_template.layout.annotations = [
     )
 ]
 
-fig=go.Figure()
+fig = go.Figure()
 fig.update_layout(template=draft_template)
 fig.show()
 ```
@@ -245,7 +273,7 @@ fig.update_layout(
             templateitemname="draft watermark",
             text="CONFIDENTIAL",
         )
-    ]
+    ],
 )
 fig.show()
 ```
@@ -350,10 +378,16 @@ pio.templates.default = "plotly+draft"
 df = px.data.gapminder()
 df_2007 = df.query("year==2007")
 
-fig = px.scatter(df_2007,
-                 x="gdpPercap", y="lifeExp", size="pop", color="continent",
-                 log_x=True, size_max=60,
-                 title="Gapminder 2007: current default theme")
+fig = px.scatter(
+    df_2007,
+    x="gdpPercap",
+    y="lifeExp",
+    size="pop",
+    color="continent",
+    log_x=True,
+    size_max=60,
+    title="Gapminder 2007: current default theme",
+)
 fig.show()
 ```
 
@@ -390,6 +424,7 @@ To get access to the `"draft"` template, import the `my_themes` module.
 ```python
 import my_themes
 import plotly.io as pio
+
 pio.templates.default = "draft"
 ...
 ```
@@ -402,6 +437,7 @@ It may be useful to examine the contents and structure of the built-in templates
 
 ```python
 import plotly.io as pio
+
 plotly_template = pio.templates["plotly"]
 plotly_template.layout
 ```

@@ -398,6 +398,7 @@ def test_function_docstring_counts_as_docstring(self) -> None:
     _assert_count("comment line(s)", 0, comments_cnt)
     _assert_count("code line(s)", 2, code_cnt)
 
+
 def test_async_function_docstring_counts_as_docstring(self) -> None:
     """Async functions follow same docstring rules as regular functions."""
     content = '''async def fetch():
@@ -415,6 +416,7 @@ def test_async_function_docstring_counts_as_docstring(self) -> None:
 ```python
 import pytest
 
+
 @pytest.mark.parametrize(
     "content,expected_docstrings,expected_comments,expected_code",
     [
@@ -423,7 +425,9 @@ import pytest
     """Function docstring."""
     pass
 ''',
-            1, 0, 2,
+            1,
+            0,
+            2,
             id="function_docstring",
         ),
         pytest.param(
@@ -431,7 +435,9 @@ import pytest
     """Async docstring."""
     pass
 ''',
-            1, 0, 2,
+            1,
+            0,
+            2,
             id="async_function_docstring",
         ),
         pytest.param(
@@ -439,7 +445,9 @@ import pytest
     """Class docstring."""
     pass
 ''',
-            1, 0, 2,
+            1,
+            0,
+            2,
             id="class_docstring",
         ),
     ],
@@ -614,6 +622,7 @@ class TestErrorHandling:
 ```python
 import pytest
 
+
 class TestIntegration:
     """End-to-end classification scenarios."""
 
@@ -717,6 +726,7 @@ For exhaustive edge case testing, consider `hypothesis`:
 
 ```python
 from hypothesis import given, strategies as st
+
 
 @given(st.text())
 def test_classify_lines_never_crashes(content: str) -> None:
