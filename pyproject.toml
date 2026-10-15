@@ -9,7 +9,7 @@ version = "0.1.0"
 description = "Visualise Python repository evolution through Git history"
 readme = "README.md"
 authors = [{ name = "Michelle", email = "your.email@example.com" }]
-requires-python = ">=3.14"
+requires-python = ">=3.15"
 dependencies = [
   "kaleido>=1.5.0", # WebP export
   "pandas>=3.0.6",  # CSV load, filter, aggregate
@@ -33,7 +33,7 @@ markers = ["slow: tests that generate images (≈3s per image)"]
 # =================================
 [tool.pyright]
 typeCheckingMode = "standard" # pyright's default; strict fights untyped libs
-pythonVersion = "3.14"
+pythonVersion = "3.15"
 venvPath = "."                # Claude Code Official: LSP plugin
 venv = ".venv"                # Claude Code Official: LSP plugin
 reportUnusedImport = false    # Ruff F401 covers it
@@ -45,7 +45,7 @@ reportDuplicateImport = false # Ruff F811
 # =================================
 [tool.ruff]
 line-length = 88
-target-version = "py314"
+target-version = "py315"
 
 [tool.ruff.lint]
 select = ["ALL"]
