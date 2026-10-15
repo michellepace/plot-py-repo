@@ -29,8 +29,9 @@ def _load_csv(csv_path: str) -> pd.DataFrame:
         print(f"❌  CSV file not found: {csv_path}")
         sys.exit(1)
     else:
-        # Parse datetime with timezone preservation
-        df["commit_date"] = pd.to_datetime(df["commit_date"])
+        # Keep each commit's own clock time, as git log shows it: drop the UTC
+        # offset ("... +0200") so commits from several timezones parse together.
+        df["commit_date"] = pd.to_datetime(df["commit_date"].str[:19])
         return df
 
 
