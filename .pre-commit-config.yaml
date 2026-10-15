@@ -4,13 +4,13 @@ repos:
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
-        args: [--markdown-linebreak-ext=md]  # keep md hard line breaks
+        args: [--markdown-linebreak-ext=md]
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.23.2
+    rev: v0.23.3
     hooks:
-      - id: markdownlint-cli2 # rules .markdownlint-cli2.yaml
-        args: [--fix]         # autofix
+      - id: markdownlint-cli2       # rules .markdownlint-cli2.yaml
+        args: [--fix]
 
   - repo: https://github.com/ComPWA/taplo-pre-commit
     rev: v0.9.3
@@ -19,30 +19,33 @@ repos:
         types: [toml]
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.12.5
+    rev: 0.13.1
     hooks:
-      - id: uv-lock
+      - id: uv-lock                 # sync uv.lock ↔ pyproject.toml
 
   - repo: local
     hooks:
-      - id: ruff-check
+      - id: ruff-check              # lint + autofix first
         name: ruff check
         entry: uv run ruff check --fix --exit-non-zero-on-fix
         language: system
         types: [python]
         pass_filenames: false
-      - id: ruff-format
+
+      - id: ruff-format             # format last, so it owns final layout
         name: ruff format
         entry: uv run ruff format
         language: system
         types: [python]
         pass_filenames: false
-      - id: pyright
+
+      - id: pyright                 # ruff lints; pyright type-checks
         name: pyright
         entry: uv run pyright
         language: system
         types: [python]
         pass_filenames: false
+
       - id: pytest
         name: pytest
         entry: uv run pytest
@@ -50,9 +53,5 @@ repos:
         types: [python]
         pass_filenames: false
 
-# Notes:
-# 1. `uv-lock` regenerates uv.lock to match pyproject.toml; any change fails the commit
-# 2. Local hooks use `uv run`, so versions come from pyproject.toml
-# 3. ruff-check (autofix) precedes ruff-format so formatter runs on the final code
-# 4. `--exit-non-zero-on-fix` fails the commit when ruff-check auto-fixes, forcing review
-# 5. `pass_filenames: false` runs each tool over the whole codebase, not just staged files
+# Notes (non-obvious)
+# 1. `pass_filenames: false` runs hook against the whole project
