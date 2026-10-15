@@ -2,9 +2,15 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: end-of-file-fixer
+      - id: check-merge-conflict
+        fail_fast: true
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+        exclude: ^\.vscode/         # .vscode/*.json is JSONC
+      - id: check-toml
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.23.3
@@ -29,29 +35,30 @@ repos:
         name: ruff check
         entry: uv run ruff check --fix --exit-non-zero-on-fix
         language: system
-        types: [python]
+        types_or: [python, pyproject]
         pass_filenames: false
 
       - id: ruff-format             # format last, so it owns final layout
         name: ruff format
         entry: uv run ruff format
         language: system
-        types: [python]
+        types_or: [python, pyproject]
         pass_filenames: false
 
       - id: pyright                 # ruff lints; pyright type-checks
         name: pyright
         entry: uv run pyright
         language: system
-        types: [python]
+        types_or: [python, pyproject]
         pass_filenames: false
 
       - id: pytest
         name: pytest
         entry: uv run pytest
         language: system
-        types: [python]
+        types_or: [python, pyproject]
         pass_filenames: false
 
 # Notes (non-obvious)
 # 1. `pass_filenames: false` runs hook against the whole project
+# 2. types_or [python, pyproject] fires on *.py + pyproject.toml only
