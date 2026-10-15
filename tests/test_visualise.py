@@ -32,6 +32,25 @@ def test_load_csv_loads_dataframe(tmp_path: Path) -> None:
     assert result["total_lines"].dtype == "int64"
 
 
+def test_load_csv_keeps_each_commits_own_clock_time_across_timezones(
+    tmp_path: Path,
+) -> None:
+    """Commits from different timezones load, keeping the time git log shows."""
+    csv_path = tmp_path / "history.csv"
+    csv_path.write_text(
+        "repo_name,commit_date\n"
+        "test-repo,2025-10-06 12:00:00 +0200\n"
+        "test-repo,2026-08-15 01:30:00 +0400\n"
+    )
+
+    result = _load_csv(str(csv_path))
+
+    assert list(result["commit_date"]) == [
+        pd.Timestamp("2025-10-06 12:00:00"),
+        pd.Timestamp("2026-08-15 01:30:00"),
+    ]
+
+
 def test_exclude_filenames_single() -> None:
     """Removes rows matching single filename."""
     df = pd.DataFrame({"filename": ["module.py", "__init__.py", "test_example.py"]})

@@ -107,11 +107,11 @@ uv run pytest                     # Run all tests
 uv run pre-commit run --all-files # Run all hooks
 ```
 
-**Tech Stack**: Python 3.14+, Plotly Express, Pandas, Kaleido • See [`.claude/CLAUDE.md`](.claude/CLAUDE.md)
+**Tech Stack**: Python 3.15+, Plotly Express, Pandas, Kaleido • See [`.claude/CLAUDE.md`](.claude/CLAUDE.md)
 
 **No Git library**: history is read with plain `git ls-tree` and `git show` calls
 
-**Test Driven Development**: 59 tests (5 slow, 54 unit, ~18 seconds)
+**Test Driven Development**: 60 tests (5 slow, 55 unit, ~18 seconds)
 
 **Strict by default**: Ruff with all rules enabled, Pyright, and pre-commit running the full suite on every commit
 
